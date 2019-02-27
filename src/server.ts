@@ -1,4 +1,27 @@
-import { serve } from "https://deno.land/x/std@v0.2.10/http/server.ts";
+import { serve, ServerRequest } from "https://deno.land/x/std@v0.2.10/http/server.ts";
+
+const Logger = console;
+
+function req2ctx(request: ServerRequest) {
+    const paramsRegx = /\?[^]*/;
+    const {url, method, proto, headers, conn, r: reader, w: writer, respond} = request;
+    let path = url, params = new Map<string, string>();
+    
+    if (paramsRegx.test(url)) {
+        let {index} = url.match(paramsRegx);
+        let p = url.substring(index + 1).split('&');
+
+        path = url.substring(0, index);
+
+        for (const param of p) {
+            let [key, val] = param.split('=');
+
+            params.set(key, val)
+        }
+    }
+
+    return {url, method, proto, headers, conn, reader, writer, respond, request: request, path, params}
+}
 
 export class Server {
     private _port = 8088;
@@ -55,21 +78,28 @@ export class Server {
     async start() {
         this._server = serve(`${this._ip}:${this._port}`);
 
-        console.log(`Server now listen on ${this._ip}:${this._port}`)
+        Logger.log(`Server now listen on ${this._ip}:${this._port}`);
 
         for await (const req of this._server) {
-            let context = {
-                request: req,
-                respond: req.respond
-            }
+            let context = req2ctx(req);
+
+            Logger.log(context.path, context.method, context.params)
 
             if(this._processes.length) {
                 for (const process of this._processes) {
-                    context = await process(context);
+                    try {
+                        context = await process(context);
+                    } catch (err) {
+                        Logger.error('While process', err)
+                    }
                 }
             }
 
-            this.controller(req, context)
+            try {
+                this.controller(req, context)
+            } catch (err) {
+                Logger.error('While Controller', err)
+            }
         }
     }
 }
