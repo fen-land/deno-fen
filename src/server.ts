@@ -20,7 +20,7 @@ function req2ctx(request: ServerRequest) {
         }
     }
 
-    return {url, method, proto, headers, conn, reader, writer, respond, request: request, path, params}
+    return {url, method, proto, headers, conn, reader, writer, respond, request: request, path, params, data: new Map<string,any>(), body: false}
 }
 
 export class Server {
@@ -83,7 +83,7 @@ export class Server {
         for await (const req of this._server) {
             let context = req2ctx(req);
 
-            Logger.log(context.path, context.method, context.params)
+            Logger.log(context.path, context.headers, context.params)
 
             if(this._processes.length) {
                 for (const process of this._processes) {
@@ -96,10 +96,21 @@ export class Server {
             }
 
             try {
-                this.controller(req, context)
+                this.controller(context)
             } catch (err) {
                 Logger.error('While Controller', err)
             }
+
+            const {body, headers} = context;
+            const respondOption = {};
+
+            if(body) {respondOption['body'] = body}
+            if(headers) {respondOption['headers'] = headers}
+
+            if(Object.keys(respondOption).length > 0) {
+                await req.respond(respondOption);
+            }
+            
         }
     }
 }
