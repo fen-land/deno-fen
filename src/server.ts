@@ -33,7 +33,7 @@ function req2ctx (request: ServerRequest) {
         }
     }
 
-    return {url, method, proto, headers, conn, reader, writer, respond, request, path, params, data: new Map<string,any>(), body: false, status: 200, config}
+    return {url, method, proto, headers, conn, reader, writer, request, path, params, data: new Map<string,any>(), body: false, status: 200, config}
 }
 
 export class Server {
