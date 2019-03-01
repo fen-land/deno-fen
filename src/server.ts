@@ -21,7 +21,8 @@ async function req2ctx (request: ServerRequest) {
     // match params in url
     const paramsRegx: RegExp = /\?[^]*/;
     const {url, method, proto, conn, r: reader, w: writer} = request;
-    const reqBody = bodyDecoder(await request.body(), request.headers);
+    const originBody = await request.body();
+    const reqBody = bodyDecoder(originBody, request.headers);
     let path = url, params = new Map<string, string>();
     const headers = new Headers();
     const config:IRespondConfig = {
@@ -46,7 +47,7 @@ async function req2ctx (request: ServerRequest) {
         }
     }
 
-    return {url, method, proto, headers, conn, reader, writer, request, path, params, data: new Map<string,any>(), body: '', status: 200, config, reqBody}
+    return {url, method, proto, headers, conn, reader, writer, request, path, params, data: new Map<string,any>(), body: '', status: 200, config, reqBody, originBody}
 }
 
 export class Server {
