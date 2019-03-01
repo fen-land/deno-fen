@@ -1,4 +1,4 @@
-import {cookieReader, cookie2String} from '../tool/cookieReader.ts';
+import {cookieReader, cookie2String} from '../tool/cookie.ts';
 
 function getRandomId() {
     return Math.random().toString(16).slice(-7);
@@ -10,7 +10,8 @@ export default class Session {
     
     process = async(context) => {
         const {headers} = context.request;
-        const cookie = cookieReader(headers);
+        const cookieStr = headers.has('cookie') ? headers.get('cookie') : "";
+        const cookie = cookieReader(cookieStr);
         let id;
 
         if(!cookie.has('session-id')) {
