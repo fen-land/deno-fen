@@ -1,12 +1,25 @@
 import { serve, ServerRequest } from "https://deno.land/x/std@v0.2.10/http/server.ts";
 
+// TODO: it's a temporary Logger for now should have a better logger!
 const Logger = console;
 
-function req2ctx(request: ServerRequest) {
-    const paramsRegx = /\?[^]*/;
+interface IRespondConfig {
+    disableRespond: boolean;
+}
+
+/**
+ * create context from request
+ * @param request
+ * @return context {IContext}
+ */
+function req2ctx (request: ServerRequest) {
+    // match params in url
+    const paramsRegx: RegExp = /\?[^]*/;
     const {url, method, proto, headers, conn, r: reader, w: writer, respond} = request;
     let path = url, params = new Map<string, string>();
-    
+    const config:IRespondConfig = {disableRespond: false};
+
+    // read two part in url (path, param)
     if (paramsRegx.test(url)) {
         let {index} = url.match(paramsRegx);
         let p = url.substring(index + 1).split('&');
@@ -20,7 +33,7 @@ function req2ctx(request: ServerRequest) {
         }
     }
 
-    return {url, method, proto, headers, conn, reader, writer, respond, request: request, path, params, data: new Map<string,any>(), body: false}
+    return {url, method, proto, headers, conn, reader, writer, respond, request, path, params, data: new Map<string,any>(), body: false, status: 200, config}
 }
 
 export class Server {
@@ -34,7 +47,7 @@ export class Server {
         this._port = p;
     }
     get ip() {
-        return this.ip;
+        return this._ip;
     }
     set ip(p) {
         this._ip = p;
@@ -52,11 +65,11 @@ export class Server {
         }
     }
 
-    async _defaultController(req, context) {
+    async _defaultController(req) {
         const statement = `You have success build a server with fen on  ${this._ip}:${this._port}\n
             Try set controller using setController method,
             Or try our route tool :)
-        `
+        `;
 
         req.respond({ body: new TextEncoder().encode(statement) });
     }
@@ -83,8 +96,6 @@ export class Server {
         for await (const req of this._server) {
             let context = req2ctx(req);
 
-            Logger.log(context.path, context.headers, context.params)
-
             if(this._processes.length) {
                 for (const process of this._processes) {
                     try {
@@ -101,13 +112,14 @@ export class Server {
                 Logger.error('While Controller', err)
             }
 
-            const {body, headers} = context;
+            const {body, headers, status, config} = context;
             const respondOption = {};
 
             if(body) {respondOption['body'] = body}
             if(headers) {respondOption['headers'] = headers}
+            if(status) {respondOption['status'] = status}
 
-            if(Object.keys(respondOption).length > 0) {
+            if(!config.disableRespond) {
                 await req.respond(respondOption);
             }
             
