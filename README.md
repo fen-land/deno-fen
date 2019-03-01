@@ -5,7 +5,18 @@
 > welcome to join us or give your advice
 
 ## How 2 use
-Ttest if it's work:
+
+First you should install [deno](https://deno.land):
+
+```bash
+curl -fsSL https://deno.land/x/install/install.sh | sh
+```
+
+Keep In Mind Now That You Are Using Github Url 2 Import Our Script!
+
+We'll provide a better way to using our script after the work is done.
+
+Test if it's work:
 
 ```typescript
 import {Server} from 'https://github.com/mxz96102/deno-fen/raw/master/src/server.ts';
@@ -23,6 +34,7 @@ import {Server} from 'https://github.com/mxz96102/deno-fen/raw/master/src/server
 
 const s = new Server();
 
+// pls keep in mind that you may add an async function as controller
 s.setController(
     async (ctx) => {
         ctx.body = 'It\'s alive!';
@@ -32,6 +44,12 @@ s.setController(
 s.port = 1882;
 
 s.start();
+```
+
+Then roll with the deno!
+```bash
+deno ${yours}.ts
+⚠️  Deno requests network access to "listen". Grant? [yN] y
 ```
 
 ## About Process
