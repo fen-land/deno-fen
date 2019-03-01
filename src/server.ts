@@ -1,10 +1,16 @@
 import { serve, ServerRequest } from "https://deno.land/x/std@v0.2.10/http/server.ts";
+import { bodyEncoder } from "./tool/body.ts";
 
 // TODO: it's a temporary Logger for now should have a better logger!
 const Logger = console;
+const encoder = new TextEncoder();
 
 interface IRespondConfig {
     disableRespond: boolean;
+    disableBodyEncode: boolean;
+    disableContentType: boolean;
+    mimeType: string;
+    charset: string;
 }
 
 /**
@@ -17,7 +23,13 @@ function req2ctx (request: ServerRequest) {
     const paramsRegx: RegExp = /\?[^]*/;
     const {url, method, proto, headers, conn, r: reader, w: writer, respond} = request;
     let path = url, params = new Map<string, string>();
-    const config:IRespondConfig = {disableRespond: false};
+    const config:IRespondConfig = {
+        disableRespond: false,
+        disableBodyEncode: false,
+        disableContentType: false,
+        mimeType: 'text/plain',
+        charset: 'utf-8'
+    };
 
     // read two part in url (path, param)
     if (paramsRegx.test(url)) {
@@ -33,7 +45,7 @@ function req2ctx (request: ServerRequest) {
         }
     }
 
-    return {url, method, proto, headers, conn, reader, writer, request, path, params, data: new Map<string,any>(), body: false, status: 200, config}
+    return {url, method, proto, headers, conn, reader, writer, request, path, params, data: new Map<string,any>(), body: '', status: 200, config}
 }
 
 export class Server {
@@ -65,13 +77,11 @@ export class Server {
         }
     }
 
-    async _defaultController(req) {
-        const statement = `You have success build a server with fen on  ${this._ip}:${this._port}\n
+    async _defaultController(ctx) {
+        ctx.body = `You have success build a server with fen on  ${this._ip}:${this._port}\n
             Try set controller using setController method,
             Or try our route tool :)
         `;
-
-        req.respond({ body: new TextEncoder().encode(statement) });
     }
 
     private _controller;
@@ -115,11 +125,17 @@ export class Server {
             const {body, headers, status, config} = context;
             const respondOption = {};
 
-            if(body) {respondOption['body'] = body}
-            if(headers) {respondOption['headers'] = headers}
-            if(status) {respondOption['status'] = status}
-
             if(!config.disableRespond) {
+                if(!config.disableBodyEncode) {
+                    respondOption['body'] = bodyEncoder(body);
+                }
+
+                if(!config.disableContentType) {
+                    headers.set('content-type', `${config.mimeType}; charset="${config.charset}"`);
+                }
+
+                if(headers) {respondOption['headers'] = headers}
+                if(status) {respondOption['status'] = status}
                 await req.respond(respondOption);
             }
             

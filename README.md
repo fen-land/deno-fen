@@ -24,8 +24,8 @@ import {Server} from 'https://github.com/mxz96102/deno-fen/raw/master/src/server
 const s = new Server();
 
 s.setController(
-    async (req, ctx) => {
-        ctx.body = new TextEncoder().encode('It\'s alive!'),
+    async (ctx) => {
+        ctx.body = 'It\'s alive!';
     }
 )
 
@@ -55,22 +55,16 @@ s.port = 1882;
 
 s.setController(
     async (ctx) => {
-        const {headers, session} = ctx;
-        let c = 0;
+        const {session} = ctx;
+        let c = session.get('c') || 1;
 
         if(ctx.path === '/') {
-            console.log('!-!', session.get('c'))
-            if(session.get('c')) {
-                c = session.get('c');
-                session.set('c', session.get('c') + 1) ;    
-            } else {
-                session.set('c', 1);
-            }
+            session.set('c',  c + 1);
         }
 
-        ctx.body = new TextEncoder().encode(`It\'s alive for path '/' ${c} times in this browser!`);
+        ctx.body = `It\'s alive for path '/' ${c} times in this browser!`;
     }
-)
+);
 
 s.start();
 ```
@@ -81,6 +75,6 @@ Tool is a series function that help to do sth with controller
 As you can see in Session
 
 ```typescript
-        const cookie = cookieReader(headers);
-        headers.append('set-cookie', cookie2String(cookie));
+const cookie = cookieReader(cookie);
+setCookie.append('set-cookie', cookie2String(cookie));
 ```

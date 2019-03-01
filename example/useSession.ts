@@ -18,7 +18,7 @@ s.setController(
             session.set('c',  c + 1);
         }
 
-        ctx.body = new TextEncoder().encode(`It\'s alive for path '/' ${c} times in this browser!`);
+        ctx.body = `It\'s alive for path '/' ${c} times in this browser!`;
     }
 );
 

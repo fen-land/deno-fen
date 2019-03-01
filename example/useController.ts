@@ -4,7 +4,7 @@ const s = new Server();
 
 s.setController(
     async (ctx) => {
-        ctx.body = new TextEncoder().encode('It\'s alive!')
+        ctx.body = 'It\'s alive!'
     }
 );
 
