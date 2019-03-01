@@ -57,7 +57,7 @@ export default class Session {
                 setCookie.set('Max-Age', Math.round(maxAge / 1000).toString());
                 setCookie.set('Expires', (new Date(time + maxAge)).toUTCString())
             }
-            headers.append('set-cookie', cookie2String(setCookie));
+            context.headers.append('set-cookie', cookie2String(setCookie));
         }
 
         if(pool) {
