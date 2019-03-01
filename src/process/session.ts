@@ -23,7 +23,7 @@ export default class Session {
         secure: false
     };
 
-    constructor(config) {
+    constructor(config?) {
         this.config = {...this.config, ...config}
     }
     
