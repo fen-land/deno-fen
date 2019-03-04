@@ -90,9 +90,45 @@ s.start();
 ### About Tool
 Tool is a series function that help to do sth with controller
 
-As you can see in Session
+As you can see in `Session`
 
 ```typescript
 const cookie = cookieReader(cookie);
 setCookie.append('set-cookie', cookie2String(cookie));
 ```
+
+### Logger
+In fen we provide a way to log info through logger we provide.
+Logger now have 5 level for log to help you develop.
+You can access them on `context.logger` .
+```
+    'ALL':  Display all log,
+    'TRACE': trace some detail,
+    'DEBUG': log to help you debug,
+    'INFO': normal info for you,
+    'WARN': simple warn,
+    'ERROR': error that won't stop the server,
+    'FATAL': once it happened, server won't work,
+    'OFF': Disable all log
+```
+
+You can change log level by  `changeLevel`, logger also can access on `Server` instance
+```typescript
+logger.changeLevel('ALL');
+```
+
+## Update Log
+
+- v0.1.0 Feb 26, 2019 
+    - 💡 Basic Server 
+- v0.2.0 Feb 27, 2019 
+    - 💡 First Tool And Process
+- v0.3.0 Feb 28, 2019 
+    - 💄 Respond now is auto
+- v0.4.0 Mar 1, 2019
+    - 💡 Body is now auto encode
+    - 💡 Add config to server
+    - 💄 New content in context
+    - 🎉 A bunch of example now is available
+- v0.5.0 Mar 4, 2019
+    - 💡 New Logger for properly info presentation
