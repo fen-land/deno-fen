@@ -134,8 +134,6 @@ export class Server {
 
                 if(status) {respondOption['status'] = status}
 
-                console.log(body, context);
-
                 await req.respond(respondOption);
             }
         }
