@@ -1,9 +1,17 @@
 # Fen (a simple web framework for deno)
 
-> it's still on development. Using deno v0.2.10.
+> It's still on development. Using deno v0.2.10.
 
-> welcome to join us or give your advice
+> Welcome to join us or give your advice
 
+  * [How 2 use](#how-2-use)
+  * [About Process](#about-process)
+    + [Session Process](#session-process)
+  * [About Tool](#about-tool)
+    + [Logger](#logger)
+    + [Static](#static)
+  * [Update Log](#update-log)
+  
 ## How 2 use
 
 First you should install [deno](https://deno.land):
@@ -87,7 +95,7 @@ s.setController(
 s.start();
 ```
 
-### About Tool
+## About Tool
 Tool is a series function that help to do sth with controller
 
 As you can see in `Session`
@@ -117,6 +125,35 @@ You can change log level by  `changeLevel`, logger also can access on `Server` i
 logger.changeLevel('ALL');
 ```
 
+### Static
+We provide a tool for static file, 
+it will generate a controller for server(or router).
+
+```typescript
+import {Server} from '../src/server.ts';
+import {staticProcess} from "../src/tool/static.ts";
+
+const s = new Server();
+
+s.port = 1882;
+// it will respond file from the path where deno run
+s.setController(staticProcess({root: ''}));
+
+s.start();
+```
+
+and here is some of the option you can fit in
+
+```
+{
+    root: root path of the file,
+    maxAge: (s),
+    allowHidden: allow access hidden file,
+    index: access if no file name provide 'index.html',
+    immutable: immutable in cache-control
+};
+```
+
 ## Update Log
 
 - v0.1.0 Feb 26, 2019 
@@ -132,3 +169,5 @@ logger.changeLevel('ALL');
     - 🎉 A bunch of example now is available
 - v0.5.0 Mar 4, 2019
     - 💡 New Logger for properly info presentation
+- v0.5.1 Mar 4, 2019  
+    - 💡 New static tool for file controller
