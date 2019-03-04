@@ -129,7 +129,11 @@ export class Server {
                 if(headers) {respondOption['headers'] = headers}
 
                 if(!config.disableContentType) {
-                    headers.set('content-type', `${config.mimeType}; charset="${config.charset}"`);
+                    if (config.charset) {
+                        headers.set('content-type', `${config.mimeType}; charset="${config.charset}"`);
+                    } else  {
+                        headers.set('content-type', `${config.mimeType}`);
+                    }
                 }
 
                 if(status) {respondOption['status'] = status}

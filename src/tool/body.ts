@@ -59,3 +59,17 @@ export function bodyDecoder(body: Uint8Array, header: Headers) {
         return body
     }
 }
+
+export function errorBodyGen(status, info) {
+    return `
+<html>
+    <head>
+        <title>Fen - ${status}</title>
+    </head>
+    <body>
+        <h1>Error ${status} !</h1>
+        <p>${info}</p>
+    </body>
+</html>
+    `
+}
