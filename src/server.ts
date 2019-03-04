@@ -113,7 +113,7 @@ export class Server {
             }
 
             try {
-                this.controller(context)
+                await this.controller(context)
             } catch (err) {
                 logger.error('While Controller', err)
             }
@@ -133,6 +133,8 @@ export class Server {
                 }
 
                 if(status) {respondOption['status'] = status}
+
+                console.log(body, context);
 
                 await req.respond(respondOption);
             }
