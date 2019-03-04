@@ -1,8 +1,6 @@
 import { serve, ServerRequest } from "https://deno.land/x/std@v0.2.10/http/server.ts";
 import { bodyEncoder, bodyDecoder } from "./tool/body.ts";
-
-// TODO: it's a temporary Logger for now should have a better logger!
-const Logger = console;
+import { Logger } from "./tool/logger.ts";
 
 interface IRespondConfig {
     disableRespond: boolean;
@@ -17,7 +15,7 @@ interface IRespondConfig {
  * @param request
  * @return context {IContext}
  */
-async function req2ctx (request: ServerRequest) {
+async function req2ctx (request: ServerRequest, logger) {
     // match params in url
     const paramsRegx: RegExp = /\?[^]*/;
     const {url, method, proto, conn, r: reader, w: writer} = request;
@@ -47,7 +45,7 @@ async function req2ctx (request: ServerRequest) {
         }
     }
 
-    return {url, method, proto, headers, conn, reader, writer, request, path, params, data: new Map<string,any>(), body: '', status: 200, config, reqBody, originBody}
+    return {url, method, proto, headers, conn, reader, writer, request, path, params, data: new Map<string,any>(), body: '', status: 200, config, reqBody, originBody, logger}
 }
 
 export class Server {
@@ -57,6 +55,10 @@ export class Server {
     _server;
 
     private _processes = [];
+
+    private _event_pool = new Map<string, Array<PromiseLike<any>>>();
+
+    logger = new Logger();
 
     addProcess(process) {
         if(this._processes.filter(e => e === process).length === 0) {
@@ -86,19 +88,26 @@ export class Server {
     }
 
     async start() {
+        let logger = this.logger;
+
         this._server = serve(`${this.ip}:${this.port}`);
 
-        Logger.log(`Server now listen on ${this.ip}:${this.port}`);
+        logger.info(`Server now listen on ${this.ip}:${this.port}`);
 
         for await (const req of this._server) {
-            let context = await req2ctx(req);
+            let context = await req2ctx(req, logger);
 
             if(this._processes.length) {
                 for (const process of this._processes) {
                     try {
-                        context = await process(context);
+                        let result = await process(context);
+                        if (result) {
+                            context = result;
+                        } else {
+                            logger.error('Process didn\'t return context properly' , process)
+                        }
                     } catch (err) {
-                        Logger.error('While process', err)
+                        logger.error('While process', err)
                     }
                 }
             }
@@ -106,7 +115,7 @@ export class Server {
             try {
                 this.controller(context)
             } catch (err) {
-                Logger.error('While Controller', err)
+                logger.error('While Controller', err)
             }
 
             const {body, headers, status, config} = context;
@@ -125,10 +134,8 @@ export class Server {
 
                 if(status) {respondOption['status'] = status}
 
-                console.log(context.reqBody);
                 await req.respond(respondOption);
             }
-            
         }
     }
 }

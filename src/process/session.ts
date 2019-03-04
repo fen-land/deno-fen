@@ -29,6 +29,7 @@ export default class Session {
     
     process = async(context) => {
         const {headers} = context.request;
+        const {logger} = context;
         const cookieStr = headers.has('cookie') ? headers.get('cookie') : "";
         let {name, secure, forceSetHeader, httpOnly, maxAge} = this.config;
         const cookie = cookieReader(cookieStr);
@@ -39,28 +40,39 @@ export default class Session {
         if(!cookie.has(name)) {
             id = getRandomId();
             forceSetHeader = true;
+            logger.trace('[SESSION] create new session id for this request;');
         } else {
             id = cookie.get(name)
         }
 
         if(!this.pool.has(id)) {
             this.pool.set(id, new Map<string, any>());
+            logger.trace('[SESSION] create new session id for this request;');
+            forceSetHeader = true;
         }
 
         const pool = this.pool.get(id);
 
         if (forceSetHeader) {
             setCookie.set(name, id);
-            if (httpOnly) {setCookie.set('HttpOnly', '')}
-            if (secure) {setCookie.set('Secure', '')}
+            if (httpOnly) {
+                logger.trace('[SESSION] set httpOnly;');
+                setCookie.set('HttpOnly', '')
+            }
+            if (secure) {
+                logger.trace('[SESSION] setSecure;');
+                setCookie.set('Secure', '')
+            }
             if (maxAge) {
                 setCookie.set('Max-Age', Math.round(maxAge / 1000).toString());
-                setCookie.set('Expires', (new Date(time + maxAge)).toUTCString())
+                setCookie.set('Expires', (new Date(time + maxAge)).toUTCString());
+                logger.trace(`[SESSION] this cookie will last ${maxAge}ms;`);
             }
             context.headers.append('set-cookie', cookie2String(setCookie));
+            logger.trace(`[SESSION] set-cookie is ${cookie2String(setCookie)};`);
         }
 
-        if(pool) {
+        if (pool) {
             context.session = pool;
         }
 
