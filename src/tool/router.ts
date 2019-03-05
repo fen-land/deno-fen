@@ -18,7 +18,7 @@ function extractParams (target: string, template: string) {
 
 interface IRoute {
     [path: string]: {
-        [method: string]: (context) => void,
+        [method: string]: (context) => Promise<void>,
     }
 }
 
