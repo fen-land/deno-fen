@@ -78,11 +78,12 @@ const ext2mime = {
 const { cwd, stat, readFile } = Deno;
 
 const defaultOpts = {
-  root: "",
-  maxAge: 0,
-  allowHidden: false,
-  index: "index.html",
-  immutable: false
+    root: "",
+    maxAge: 0,
+    allowHidden: false,
+    index: "index.html",
+    immutable: false,
+    pathRender: (str) => str
 };
 
 export function staticProcess(option = {}) {
@@ -90,8 +91,9 @@ export function staticProcess(option = {}) {
 
   return async function(context) {
     const { config, logger, method } = context;
-    const { root, allowHidden, maxAge, index, immutable } = opt;
-    let filePath = (root || cwd()) + context.path;
+    const { root, allowHidden, maxAge, index, immutable, pathRender } = opt;
+    const path = pathRender(context.path);
+    let filePath = (root || cwd()) + path;
     let file;
 
     config.mimeType = "";

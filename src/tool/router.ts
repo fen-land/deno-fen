@@ -18,7 +18,7 @@ function extractParams (target: string, template: string) {
 
 interface IRoute {
     [path: string]: {
-        [method: string]: (context) => Promise<void>,
+        [method: string]: (context) => void,
     }
 }
 
@@ -63,7 +63,6 @@ export class Router {
         let pathArr = path.split('/');
 
         for (const p of pathArr) {
-            console.log(p);
             if (p) {
                 if (pool.has(p)) {
                     pool = pool.get(p);
@@ -115,7 +114,7 @@ export class Router {
         return this;
     }
 
-    merge(route, router:Router) {
+    merge(route: string, router:Router) {
         let pool = this.pool;
         let _route = route.startsWith('/') ? route.slice(1) : route;
         const routeArr = _route.split('/');
@@ -134,8 +133,28 @@ export class Router {
             }
         }
 
+        const changeQ:Map<string,any>[] = [];
+
         for (const [key, val] of router.pool.entries()) {
             pool.set(key, val);
+            if (val instanceof Map) {
+                changeQ.push(val)
+            }
+        }
+
+        while(changeQ.length > 0) {
+            let change = changeQ.pop();
+
+            for (const [key, val] of change.entries()) {
+                if (val instanceof Map) {
+                    changeQ.push(val)
+                } else if (val) {
+                    if (!val.orginRoute) {
+                        val.orginRoute = val.route
+                    }
+                    val.route = route + val.route
+                }
+            }
         }
 
         return this;

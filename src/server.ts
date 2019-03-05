@@ -107,7 +107,7 @@ export class Server {
     return this._defaultController;
   }
 
-  setController(controller: (context) => Promise<void>) {
+  setController(controller: (context) => void) {
     this._controller = controller;
   }
 

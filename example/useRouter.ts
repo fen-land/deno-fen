@@ -12,7 +12,7 @@ let mergeRouter = new Router('merge');
 mergeRouter
   .get('', async (ctx) => ctx.body = `${ctx.router.name} in ${ctx.router.route}`)
   .post('', async (ctx) => ctx.body = `POST ${ctx.router.name} in ${ctx.router.route}`)
-  .get('me', async (ctx) => ctx.body = `${ctx.router.name} in ${ctx.router.route}`);
+  .get('me/:name', async (ctx) => ctx.body = `${ctx.router.name} dis ${ctx.router.params.name} in ${ctx.router.route}`);
 
 let router = new Router();
 
@@ -32,7 +32,6 @@ router
   .merge('/merge', mergeRouter);
 ;
 
-// it will respond file from the path where deno run
 s.setController(router.controller);
 
 s.start();

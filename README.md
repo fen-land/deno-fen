@@ -7,6 +7,7 @@
   * [About Process](#about-process)
     + [Session Process](#session-process)
   * [About Tool](#about-tool)
+    + [Router](#router)
     + [Logger](#logger)
     + [Static](#static)
   * [Update Log](#update-log)
@@ -209,7 +210,8 @@ and here is some of the option you can fit in
     maxAge: (s),
     allowHidden: allow access hidden file,
     index: access if no file name provide 'index.html',
-    immutable: immutable in cache-control
+    immutable: immutable in cache-control,
+    pathRender: (path) => afterpath, if you want do sth. with path
 };
 ```
 
@@ -230,3 +232,7 @@ and here is some of the option you can fit in
     - 💡 New Logger for properly info presentation
 - v0.5.1 Mar 4, 2019  
     - 💡 New static tool for file controller
+- v0.5.3 Mar 5, 2019  
+    - 💡 New router tool for controller
+    - 💄 Add path render in static
+    - 🎉 Using deno v0.3.0 now
