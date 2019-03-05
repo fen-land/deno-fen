@@ -89,7 +89,7 @@ export function staticProcess(option = {}) {
   const opt = { ...defaultOpts, ...option };
 
   return async function(context) {
-    const { config, logger } = context;
+    const { config, logger, method } = context;
     const { root, allowHidden, maxAge, index, immutable } = opt;
     let filePath = (root || cwd()) + context.path;
     let file;
@@ -99,6 +99,13 @@ export function staticProcess(option = {}) {
 
     if (!filePath.startsWith("/")) {
       filePath = cwd() + filePath;
+    }
+
+    if (method !== 'GET' && method !== 'HEAD') {
+      context.body = errorBodyGen("405", "Method Not Allowed");
+      context.status = 405;
+      logger.error('[STATIC] method not allowed', context.method);
+      return
     }
 
     try {
@@ -151,14 +158,15 @@ export function staticProcess(option = {}) {
         context.headers.append("cache-control", cc.join(","));
       }
     } catch (e) {
-      logger.error("static file error", e);
+      logger.error("[STATIC] static file error", e);
     }
 
     if (!file) {
       context.body = errorBodyGen("404", "Not found the file");
       context.status = 404;
       config.mimeType = "text/html";
-      console.log(404, filePath);
     }
+
+    logger.trace('[STATIC]', context.method, context.status, filePath);
   };
 }
