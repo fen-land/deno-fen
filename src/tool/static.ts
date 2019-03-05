@@ -78,12 +78,12 @@ const ext2mime = {
 const { cwd, stat, readFile } = Deno;
 
 const defaultOpts = {
-    root: "",
-    maxAge: 0,
-    allowHidden: false,
-    index: "index.html",
-    immutable: false,
-    pathRender: (str) => str
+  root: "",
+  maxAge: 0,
+  allowHidden: false,
+  index: "index.html",
+  immutable: false,
+  pathRender: str => str
 };
 
 export function staticProcess(option = {}) {
@@ -103,11 +103,11 @@ export function staticProcess(option = {}) {
       filePath = cwd() + filePath;
     }
 
-    if (method !== 'GET' && method !== 'HEAD') {
+    if (method !== "GET" && method !== "HEAD") {
       context.body = errorBodyGen("405", "Method Not Allowed");
       context.status = 405;
-      logger.error('[STATIC] method not allowed', context.method);
-      return
+      logger.error("[STATIC] method not allowed", context.method);
+      return;
     }
 
     try {
@@ -169,6 +169,12 @@ export function staticProcess(option = {}) {
       config.mimeType = "text/html";
     }
 
-    logger.trace('[STATIC]', context.path, context.method, context.status, filePath);
+    logger.trace(
+      "[STATIC]",
+      context.path,
+      context.method,
+      context.status,
+      filePath
+    );
   };
 }

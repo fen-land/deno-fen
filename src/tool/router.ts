@@ -1,203 +1,208 @@
-import {Logger} from "./logger.ts";
-import {errorBodyGen} from "./body.ts";
+import { Logger } from "./logger.ts";
+import { errorBodyGen } from "./body.ts";
 
 const logger = new Logger();
 
-function extractParams (target: string, template: string) {
-    let t1 = target.split('/'), t2 = template.split('/');
-    const result = {};
+function extractParams(target: string, template: string) {
+  let t1 = target.split("/"),
+    t2 = template.split("/");
+  const result = {};
 
-    t2.map((el, i) => {
-        if(el.startsWith(':')) {
-            result[el.substring(1)] = decodeURIComponent(t1[i]);
-        }
-    });
+  t2.map((el, i) => {
+    if (el.startsWith(":")) {
+      result[el.substring(1)] = decodeURIComponent(t1[i]);
+    }
+  });
 
-    return result;
+  return result;
 }
 
 interface IRoute {
-    [path: string]: {
-        [method: string]: (context) => void,
-    }
+  [path: string]: {
+    [method: string]: (context) => void;
+  };
 }
 
 export class Router {
-    constructor(name = '') {
-        this.name = name;
+  constructor(name = "") {
+    this.name = name;
+  }
+
+  pool = new Map<string, any>();
+
+  name = "";
+
+  appendRoute(method, route, controller) {
+    let pool = this.pool;
+    let _route = route.startsWith("/") ? route : "/" + route;
+    let routeArr = _route.split("/");
+    let routerName = this.name;
+
+    for (let r of routeArr) {
+      if (r) {
+        if (r.startsWith(":")) {
+          r = ":";
+        }
+
+        if (!pool.has(r)) {
+          pool.set(r, new Map());
+        }
+
+        pool = pool.get(r);
+      }
     }
 
-    pool = new Map<string, any>();
-
-    name = "";
-
-    appendRoute(method, route, controller) {
-        let pool = this.pool;
-        let _route = route.startsWith('/') ? route : '/' + route;
-        let routeArr = _route.split('/');
-        let routerName = this.name;
-
-        for (let r of routeArr) {
-            if(r) {
-                if (r.startsWith(':')) {
-                    r = ':';
-                }
-
-                if (!pool.has(r)) {
-                    pool.set(r, new Map())
-                }
-
-                pool = pool.get(r)
-            }
-        }
-
-        if(pool.has('__' + method + '__')) {
-            logger.warn('[Route] You are replacing route', route)
-        }
-
-        pool.set('__' + method + '__', {route: _route, method, controller, name: routerName});
+    if (pool.has("__" + method + "__")) {
+      logger.warn("[Route] You are replacing route", route);
     }
 
-    private getRoute(path, method) {
-        let pool = this.pool;
-        let pathArr = path.split('/');
+    pool.set("__" + method + "__", {
+      route: _route,
+      method,
+      controller,
+      name: routerName
+    });
+  }
 
-        for (const p of pathArr) {
-            if (p) {
-                if (pool.has(p)) {
-                    pool = pool.get(p);
-                } else if(pool.has(':')) {
-                    pool = pool.get(':')
-                } else {
-                    return null;
-                }
-            }
-        }
+  private getRoute(path, method) {
+    let pool = this.pool;
+    let pathArr = path.split("/");
 
-        if (pool.has('__' + method + '__')) {
-            return pool.get('__' + method + '__')
-        }
-
-        return null
-    }
-
-    controller = async (ctx) => {
-        let r = this.getRoute(ctx.path, ctx.method);
-
-        if (r) {
-            const {route, controller, name} = r;
-            const params = extractParams(ctx.path, route);
-
-            ctx.router = {
-                route,
-                params,
-                name
-            };
-
-            await controller(ctx);
+    for (const p of pathArr) {
+      if (p) {
+        if (pool.has(p)) {
+          pool = pool.get(p);
+        } else if (pool.has(":")) {
+          pool = pool.get(":");
         } else {
-            ctx.body = errorBodyGen("404", "Not found the file");
-            ctx.status = 404;
-            ctx.config.mimeType = "text/html";
+          return null;
         }
-    };
-
-    use(route: IRoute) {
-        for(const r in route) {
-            for(const method in route[r]) {
-                if (route[r].hasOwnProperty(method)) {
-                    this.appendRoute(method.toUpperCase(), r, route[r][method]);
-                }
-            }
-        }
-
-        return this;
+      }
     }
 
-    merge(route: string, router:Router) {
-        let pool = this.pool;
-        let _route = route.startsWith('/') ? route.slice(1) : route;
-        const routeArr = _route.split('/');
+    if (pool.has("__" + method + "__")) {
+      return pool.get("__" + method + "__");
+    }
 
-        for (let r of routeArr) {
-            if(r) {
-                if (r.startsWith(':')) {
-                    r = ':';
-                }
+    return null;
+  }
 
-                if (!pool.has(r)) {
-                    pool.set(r, new Map())
-                }
+  controller = async ctx => {
+    let r = this.getRoute(ctx.path, ctx.method);
 
-                pool = pool.get(r)
-            }
+    if (r) {
+      const { route, controller, name } = r;
+      const params = extractParams(ctx.path, route);
+
+      ctx.router = {
+        route,
+        params,
+        name
+      };
+
+      await controller(ctx);
+    } else {
+      ctx.body = errorBodyGen("404", "Not found the file");
+      ctx.status = 404;
+      ctx.config.mimeType = "text/html";
+    }
+  };
+
+  use(route: IRoute) {
+    for (const r in route) {
+      for (const method in route[r]) {
+        if (route[r].hasOwnProperty(method)) {
+          this.appendRoute(method.toUpperCase(), r, route[r][method]);
         }
+      }
+    }
 
-        const changeQ:Map<string,any>[] = [];
+    return this;
+  }
 
-        for (const [key, val] of router.pool.entries()) {
-            pool.set(key, val);
-            if (val instanceof Map) {
-                changeQ.push(val)
-            }
-        }
+  merge(route: string, router: Router) {
+    let pool = this.pool;
+    let _route = route.startsWith("/") ? route.slice(1) : route;
+    const routeArr = _route.split("/");
 
-        while(changeQ.length > 0) {
-            let change = changeQ.pop();
-
-            for (const [key, val] of change.entries()) {
-                if (val instanceof Map) {
-                    changeQ.push(val)
-                } else if (val) {
-                    if (!val.orginRoute) {
-                        val.orginRoute = val.route
-                    }
-                    val.route = route + val.route
-                }
-            }
+    for (let r of routeArr) {
+      if (r) {
+        if (r.startsWith(":")) {
+          r = ":";
         }
 
-        return this;
+        if (!pool.has(r)) {
+          pool.set(r, new Map());
+        }
+
+        pool = pool.get(r);
+      }
     }
 
-    get(route, controller) {
-        this.appendRoute('GET', route, controller);
-        return this;
+    const changeQ: Map<string, any>[] = [];
+
+    for (const [key, val] of router.pool.entries()) {
+      pool.set(key, val);
+      if (val instanceof Map) {
+        changeQ.push(val);
+      }
     }
 
-    post(route, controller) {
-        this.appendRoute('POST', route, controller);
-        return this;
+    while (changeQ.length > 0) {
+      let change = changeQ.pop();
+
+      for (const [key, val] of change.entries()) {
+        if (val instanceof Map) {
+          changeQ.push(val);
+        } else if (val) {
+          if (!val.orginRoute) {
+            val.orginRoute = val.route;
+          }
+          val.route = route + val.route;
+        }
+      }
     }
 
-    head(route, controller) {
-        this.appendRoute('HEAD', route, controller);
-        return this;
-    }
+    return this;
+  }
 
-    put(route, controller) {
-        this.appendRoute('PUT', route, controller);
-        return this;
-    }
+  get(route, controller) {
+    this.appendRoute("GET", route, controller);
+    return this;
+  }
 
-    delete (route, controller) {
-        this.appendRoute('DELETE', route, controller);
-        return this;
-    }
+  post(route, controller) {
+    this.appendRoute("POST", route, controller);
+    return this;
+  }
 
-    connect(route, controller) {
-        this.appendRoute('CONNECT', route, controller);
-        return this;
-    }
+  head(route, controller) {
+    this.appendRoute("HEAD", route, controller);
+    return this;
+  }
 
-    options(route, controller) {
-        this.appendRoute('OPTION', route, controller);
-        return this;
-    }
+  put(route, controller) {
+    this.appendRoute("PUT", route, controller);
+    return this;
+  }
 
-    trace(route, controller) {
-        this.appendRoute('TRACE', route, controller);
-        return this;
-    }
-    
+  delete(route, controller) {
+    this.appendRoute("DELETE", route, controller);
+    return this;
+  }
+
+  connect(route, controller) {
+    this.appendRoute("CONNECT", route, controller);
+    return this;
+  }
+
+  options(route, controller) {
+    this.appendRoute("OPTION", route, controller);
+    return this;
+  }
+
+  trace(route, controller) {
+    this.appendRoute("TRACE", route, controller);
+    return this;
+  }
 }
