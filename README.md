@@ -1,13 +1,13 @@
 # Fen (a simple web framework for deno)
 
-> It's still on development. Using deno v0.2.10.
-
+> It's still on development. Using deno v0.3.0.
 > Welcome to join us or give your advice
 
   * [How 2 use](#how-2-use)
   * [About Process](#about-process)
     + [Session Process](#session-process)
   * [About Tool](#about-tool)
+    + [Router](#router)
     + [Logger](#logger)
     + [Static](#static)
   * [Update Log](#update-log)
@@ -105,6 +105,66 @@ const cookie = cookieReader(cookie);
 setCookie.append('set-cookie', cookie2String(cookie));
 ```
 
+### Router
+In fen we provide a way to arrange route,
+router tool.
+
+
+This example shows many way to use router
+```typescript
+import { Server } from "../src/server.ts";
+import { Router } from "../src/tool/router.ts";
+
+const s = new Server();
+
+s.port = 1882;
+
+s.logger.changeLevel('ALL');
+
+let mergeRouter = new Router('merge');
+
+mergeRouter
+  .get('/', async (ctx) => ctx.body = `${ctx.router.name} in ${ctx.router.route}`)
+  .post('/', async (ctx) => ctx.body = `POST ${ctx.router.name} in ${ctx.router.route}`)
+  .get('me', async (ctx) => ctx.body = `${ctx.router.name} in ${ctx.router.route}`);
+
+let router = new Router();
+
+router
+  .get('/:id', async (ctx) => {
+  ctx.body = `we have ${JSON.stringify(ctx.router.params)} in ${ctx.router.route}`
+})
+  .get('/:id/:name', async (ctx) => {
+  ctx.body = `we have ${JSON.stringify(ctx.router.params)} in ${ctx.router.route}`
+})
+  .get('/hello/:name', async (ctx) => {
+    ctx.body = `hello ${ctx.router.params.name} in ${ctx.router.route}`
+  })
+  .use({ '/use': {get: async (ctx) => ctx.body = `use in ${ctx.router.route}`}})
+  .merge('/merge', mergeRouter);
+;
+
+s.setController(router.controller);
+
+s.start();
+```
+
+`Router` now support these method: 
+```
+    use(route: IRoute) // a way to add route
+    // IRoute just like:
+    // {[path]: {[method]: async function controller(cxt)}}
+    merge(route: string, router:Router) // merge other router by add prefix route
+    get
+    post
+    head
+    put
+    delete
+    connect
+    options
+    trace
+```
+
 ### Logger
 In fen we provide a way to log info through logger we provide.
 Logger now have 5 level for log to help you develop.
@@ -150,7 +210,8 @@ and here is some of the option you can fit in
     maxAge: (s),
     allowHidden: allow access hidden file,
     index: access if no file name provide 'index.html',
-    immutable: immutable in cache-control
+    immutable: immutable in cache-control,
+    pathRender: (path) => afterpath, if you want do sth. with path
 };
 ```
 
@@ -171,3 +232,7 @@ and here is some of the option you can fit in
     - 💡 New Logger for properly info presentation
 - v0.5.1 Mar 4, 2019  
     - 💡 New static tool for file controller
+- v0.5.3 Mar 5, 2019  
+    - 💡 New router tool for controller
+    - 💄 Add path render in static
+    - 🎉 Using deno v0.3.0 now

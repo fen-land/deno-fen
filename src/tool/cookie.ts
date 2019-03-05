@@ -3,16 +3,16 @@
  * @param cookie
  */
 export function cookieReader(cookie: string) {
-    const result = new Map<string, string>();
-    const cookieStrs = cookie.split(';');
+  const result = new Map<string, string>();
+  const cookieStrs = cookie.split(";");
 
-    for (const str of cookieStrs) {
-        let [key, value] = str.trim().split('=');
+  for (const str of cookieStrs) {
+    let [key, value] = str.trim().split("=");
 
-        result.set(key, value);
-    }
+    result.set(key, value);
+  }
 
-    return result;
+  return result;
 }
 
 /**
@@ -20,8 +20,8 @@ export function cookieReader(cookie: string) {
  * @param cookie
  */
 export function cookie2String(cookie: Map<string, string>) {
-    let result = "";
-    cookie.forEach((v, k) => result += v ? `${k}=${v}; ` : `${k}; `);
-    result.trim().slice(0,-1);
-    return result;
+  let result = "";
+  cookie.forEach((v, k) => (result += v ? `${k}=${v}; ` : `${k}; `));
+  result.trim().slice(0, -1);
+  return result;
 }
