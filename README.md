@@ -104,6 +104,66 @@ const cookie = cookieReader(cookie);
 setCookie.append('set-cookie', cookie2String(cookie));
 ```
 
+### Router
+In fen we provide a way to arrange route,
+router tool.
+
+
+This example shows many way to use router
+```typescript
+import { Server } from "../src/server.ts";
+import { Router } from "../src/tool/router.ts";
+
+const s = new Server();
+
+s.port = 1882;
+
+s.logger.changeLevel('ALL');
+
+let mergeRouter = new Router('merge');
+
+mergeRouter
+  .get('/', async (ctx) => ctx.body = `${ctx.router.name} in ${ctx.router.route}`)
+  .post('/', async (ctx) => ctx.body = `POST ${ctx.router.name} in ${ctx.router.route}`)
+  .get('me', async (ctx) => ctx.body = `${ctx.router.name} in ${ctx.router.route}`);
+
+let router = new Router();
+
+router
+  .get('/:id', async (ctx) => {
+  ctx.body = `we have ${JSON.stringify(ctx.router.params)} in ${ctx.router.route}`
+})
+  .get('/:id/:name', async (ctx) => {
+  ctx.body = `we have ${JSON.stringify(ctx.router.params)} in ${ctx.router.route}`
+})
+  .get('/hello/:name', async (ctx) => {
+    ctx.body = `hello ${ctx.router.params.name} in ${ctx.router.route}`
+  })
+  .use({ '/use': {get: async (ctx) => ctx.body = `use in ${ctx.router.route}`}})
+  .merge('/merge', mergeRouter);
+;
+
+s.setController(router.controller);
+
+s.start();
+```
+
+`Router` now support these method: 
+```
+    use(route: IRoute) // a way to add route
+    // IRoute just like:
+    // {[path]: {[method]: async function controller(cxt)}}
+    merge(route: string, router:Router) // merge other router by add prefix route
+    get
+    post
+    head
+    put
+    delete
+    connect
+    options
+    trace
+```
+
 ### Logger
 In fen we provide a way to log info through logger we provide.
 Logger now have 5 level for log to help you develop.
