@@ -167,6 +167,6 @@ export function staticProcess(option = {}) {
       config.mimeType = "text/html";
     }
 
-    logger.trace('[STATIC]', context.method, context.status, filePath);
+    logger.trace('[STATIC]', context.path, context.method, context.status, filePath);
   };
 }
