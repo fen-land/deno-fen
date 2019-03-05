@@ -1,7 +1,6 @@
 # Fen (a simple web framework for deno)
 
-> It's still on development. Using deno v0.2.10.
-
+> It's still on development. Using deno v0.3.0.
 > Welcome to join us or give your advice
 
   * [How 2 use](#how-2-use)
