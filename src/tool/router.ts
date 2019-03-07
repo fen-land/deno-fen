@@ -1,8 +1,3 @@
-import { Logger } from "./logger.ts";
-import { errorBodyGen } from "./body.ts";
-
-const logger = new Logger();
-
 function extractParams(target: string, template: string) {
   let t1 = target.split("/"),
     t2 = template.split("/");
@@ -52,10 +47,6 @@ export class Router {
       }
     }
 
-    if (pool.has("__" + method + "__")) {
-      logger.warn("[Route] You are replacing route", route);
-    }
-
     pool.set("__" + method + "__", {
       route: _route,
       method,
@@ -102,9 +93,7 @@ export class Router {
 
       await controller(ctx);
     } else {
-      ctx.body = errorBodyGen("404", "Not found the file");
-      ctx.status = 404;
-      ctx.config.mimeType = "text/html";
+      ctx.throw(404, 'Not Found Route');
     }
   };
 
