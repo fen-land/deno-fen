@@ -2,8 +2,19 @@ import {
   serve,
   ServerRequest
 } from "https://deno.land/x/std@v0.3.0/http/server.ts";
-import { bodyEncoder, bodyDecoder } from "./tool/body.ts";
+import { bodyEncoder, bodyDecoder, errorBodyGen } from "./tool/body.ts";
 import { Logger } from "./tool/logger.ts";
+
+class HttpError extends Error {
+  code = 0;
+  message = '';
+
+  constructor(code: number, message: string) {
+    super(message);
+    this.code = code;
+    this.message = message;
+  }
+}
 
 interface IRespondConfig {
   disableRespond: boolean;
@@ -16,9 +27,10 @@ interface IRespondConfig {
 /**
  * create context from request
  * @param request
+ * @param server
  * @return context {IContext}
  */
-async function req2ctx(request: ServerRequest, logger) {
+async function req2ctx(request: ServerRequest, server: Server) {
   // match params in url
   const paramsRegx: RegExp = /\?[^]*/;
   const { url, method, proto, conn, r: reader, w: writer } = request;
@@ -66,35 +78,32 @@ async function req2ctx(request: ServerRequest, logger) {
     config,
     reqBody,
     originBody,
-    logger
+    logger: server.logger,
+    throw: (code, msg) => {throw new HttpError(code, msg)}
   };
 }
 
 export class Server {
   port = 8088;
   ip = "0.0.0.0";
-
   _server;
+  logger = new Logger();
 
   private _processes = [];
 
-  private _event_pool = new Map<string, Array<PromiseLike<any>>>();
-
-  logger = new Logger();
+  private async _defaultController(ctx) {
+    ctx.body = `You have success build a server with fen on  ${this.ip}:${
+      this.port
+      }\n
+            Try set controller using setController method,
+            Or try our route tool :)
+        `;
+  }
 
   addProcess(process) {
     if (this._processes.filter(e => e === process).length === 0) {
       this._processes.push(process);
     }
-  }
-
-  private async _defaultController(ctx) {
-    ctx.body = `You have success build a server with fen on  ${this.ip}:${
-      this.port
-    }\n
-            Try set controller using setController method,
-            Or try our route tool :)
-        `;
   }
 
   private _controller;
@@ -119,7 +128,8 @@ export class Server {
     logger.info(`Server now listen on ${this.ip}:${this.port}`);
 
     for await (const req of this._server) {
-      let context = await req2ctx(req, logger);
+      let context = await req2ctx(req, this);
+      let errorBody = null;
 
       if (this._processes.length) {
         for (const process of this._processes) {
@@ -132,14 +142,26 @@ export class Server {
             }
           } catch (err) {
             logger.error("While process", err);
+            if (err.code) {
+              errorBody = errorBodyGen(err.code, err.message);
+              context.status = err.code;
+              context.body = errorBody;
+            }
           }
         }
       }
 
-      try {
-        await this.controller(context);
-      } catch (err) {
-        logger.error("While Controller", err);
+      if (!errorBody) {
+        try {
+          await this.controller(context);
+        } catch (err) {
+          logger.error("While Controller", err);
+          if (err.code) {
+            errorBody = errorBodyGen(err.code, err.message);
+            context.status = err.code;
+            context.body = errorBody;
+          }
+        }
       }
 
       const { body, headers, status, config } = context;
@@ -155,6 +177,10 @@ export class Server {
         }
 
         if (!config.disableContentType) {
+          if (errorBody) {
+            config.mimeType = 'text/html'
+          }
+
           if (config.charset) {
             headers.set(
               "content-type",

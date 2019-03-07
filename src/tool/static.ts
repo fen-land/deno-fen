@@ -1,5 +1,3 @@
-import { errorBodyGen } from "./body.ts";
-
 const ext2mime = {
   ".aac": "audio/aac",
   ".abw": "application/x-abiword",
@@ -104,10 +102,8 @@ export function staticProcess(option = {}) {
     }
 
     if (method !== "GET" && method !== "HEAD") {
-      context.body = errorBodyGen("405", "Method Not Allowed");
-      context.status = 405;
       logger.error("[STATIC] method not allowed", context.method);
-      return;
+      context.throw(405, 'Method Not Allowed');
     }
 
     try {
@@ -130,9 +126,7 @@ export function staticProcess(option = {}) {
           .pop()
           .startsWith(".")
       ) {
-        context.body = errorBodyGen("403", "Forbidden File");
-        context.status = 403;
-        throw new Error("Hidden file not allowed");
+        context.throw(403, "Forbidden File");
       }
 
       if (file) {
@@ -142,8 +136,7 @@ export function staticProcess(option = {}) {
           config.mimeType = ext2mime[ext];
         }
       } else {
-        context.body = errorBodyGen("404", "Not found the file");
-        context.status = 404;
+        context.throw(404, 'Not Found Route');
       }
 
       if (maxAge || immutable) {
@@ -161,12 +154,11 @@ export function staticProcess(option = {}) {
       }
     } catch (e) {
       logger.error("[STATIC] static file error", e);
+      context.throw(404, 'Not Found File');
     }
 
     if (!file) {
-      context.body = errorBodyGen("404", "Not found the file");
-      context.status = 404;
-      config.mimeType = "text/html";
+      context.throw(404, 'Not Found File');
     }
 
     logger.trace(
