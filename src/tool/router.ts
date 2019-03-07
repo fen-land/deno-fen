@@ -49,6 +49,7 @@ export class Router {
 
     pool.set("__" + method + "__", {
       route: _route,
+      originalRoute: _route,
       method,
       controller,
       name: routerName
@@ -134,6 +135,8 @@ export class Router {
       pool.set(key, val);
       if (val instanceof Map) {
         changeQ.push(val);
+      } else if (val) {
+        val.route = route + val.route;
       }
     }
 
@@ -144,9 +147,6 @@ export class Router {
         if (val instanceof Map) {
           changeQ.push(val);
         } else if (val) {
-          if (!val.orginRoute) {
-            val.orginRoute = val.route;
-          }
           val.route = route + val.route;
         }
       }
