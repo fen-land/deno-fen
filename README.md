@@ -27,7 +27,7 @@ We'll provide a better way to using our script after the work is done.
 Test if it's work:
 
 ```typescript
-import {Server} from 'https://github.com/mxz96102/deno-fen/raw/master/src/server.ts';
+import {Server} from 'https://github.com/fen-land/deno-fen/raw/master/src/server.ts';
 
 const s = new Server();
 
@@ -38,7 +38,7 @@ s.start();
 
 Add your own controller 
 ```typescript
-import {Server} from 'https://github.com/mxz96102/deno-fen/raw/master/src/server.ts';
+import {Server} from 'https://github.com/fen-land/deno-fen/raw/master/src/server.ts';
 
 const s = new Server();
 
@@ -68,8 +68,8 @@ process is a series of process between controller, you can develop your own proc
 It's a simple session for Fen, using session(a map) to store data.
 
 ```typescript
-import {Server} from 'https://github.com/mxz96102/deno-fen/raw/master/src/server.ts';
-import Session from 'https://github.com/mxz96102/deno-fen/raw/master/src/process/session.ts'
+import {Server} from 'https://github.com/fen-land/deno-fen/raw/master/src/server.ts';
+import Session from 'https://github.com/fen-land/deno-fen/raw/master/src/process/session.ts'
 
 const session = new Session();
 
@@ -217,22 +217,25 @@ and here is some of the option you can fit in
 
 ## Update Log
 
-- v0.1.0 Feb 26, 2019 
-    - 💡 Basic Server 
-- v0.2.0 Feb 27, 2019 
-    - 💡 First Tool And Process
-- v0.3.0 Feb 28, 2019 
-    - 💄 Respond now is auto
+- v0.6.0 Mar 7, 2019
+    - 💡 New http error handler
+    - 💄 Decompose tool from each other, now tool only depend on Server context
+- v0.5.3 Mar 5, 2019  
+    - 💡 New router tool for controller
+    - 💄 Add path render in static
+    - 🎉 Using deno v0.3.0 now
+- v0.5.1 Mar 4, 2019  
+    - 💡 New static tool for file controller
+- v0.5.0 Mar 4, 2019
+    - 💡 New Logger for properly info presentation
 - v0.4.0 Mar 1, 2019
     - 💡 Body is now auto encode
     - 💡 Add config to server
     - 💄 New content in context
     - 🎉 A bunch of example now is available
-- v0.5.0 Mar 4, 2019
-    - 💡 New Logger for properly info presentation
-- v0.5.1 Mar 4, 2019  
-    - 💡 New static tool for file controller
-- v0.5.3 Mar 5, 2019  
-    - 💡 New router tool for controller
-    - 💄 Add path render in static
-    - 🎉 Using deno v0.3.0 now
+- v0.3.0 Feb 28, 2019 
+    - 💄 Respond now is auto
+- v0.2.0 Feb 27, 2019 
+    - 💡 First Tool And Process
+- v0.1.0 Feb 26, 2019 
+    - 💡 Basic Server 
