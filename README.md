@@ -60,6 +60,40 @@ deno ${yours}.ts
 ⚠️  Deno requests network access to "listen". Grant? [yN] y
 ```
 
+## About Context
+Context is the only way now to pass data and get data.
+
+```
+{
+ // ---- All from ServerRequest
+  url,
+  method,
+  proto,
+  headers,
+  conn,
+  reader,
+  writer,
+ // ----     
+  request,    
+  path, // url path without params and ip:port
+  params, // Map<string, string>  params in url 
+  data: new Map<string, any>(),
+  body: "",// respond body
+  status: 200,// respond status
+  config: {
+    disableRespond: false, // disable fen's respond
+    disableBodyEncode: false, 
+    disableContentType: false, 
+    mimeType: "text/plain",
+    charset: "utf-8" 
+  },
+  reqBody, // request body(after try to decode)
+  originBody, // request body
+  logger, // logger
+  throw(code, message) // throw an http error
+};
+```
+
 ## About Process
 
 process is a series of process between controller, you can develop your own process;
