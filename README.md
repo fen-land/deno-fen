@@ -1,11 +1,13 @@
-# Fen (a simple web framework for deno)
+# Fen
 [![Build Status](https://travis-ci.org/fen-land/deno-fen.svg?branch=master)](https://travis-ci.org/fen-land/deno-fen)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/fen-land/deno-fen.svg?color=%2366ccff&label=version)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/denoland/deno_std.svg?label=deno_std)
 
+> A simple web framework for deno.
+>
 > Welcome to join us or give your advice
 
-> A simple web framework for deno
+![Logo](./logo.png)
 
 - [How 2 use](#how-2-use)
 - [About Context](#about-context)
