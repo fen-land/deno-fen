@@ -1,0 +1,13 @@
+language: sh
+
+install:
+  - curl -L https://deno.land/x/install/install.sh | sh -s v0.3.2
+  - export PATH="$HOME/.deno/bin:$PATH"
+
+script:
+  - deno --version
+  - deno test/test.ts -A --reload --recompile
+
+cache:
+  directories:
+    - '$HOME/.deno'

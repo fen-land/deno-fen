@@ -1,6 +1,6 @@
 # Fen (a simple web framework for deno)
 
-> It's still on development. Using deno v0.3.0.
+> It's still on development. Using deno v0.3.2.
 > Welcome to join us or give your advice
 
 - [How 2 use](#how-2-use)
@@ -289,6 +289,8 @@ and here is some of the option you can fit in
 - v0.7.0 Mar 11, 2019
   - 💡 New path structure for import
   - 💄 Now all process and tool pass data through context.data
+  - 🎉 Using deno v0.3.2 now
+  - 🎉 Add a bunch of test now
 - v0.6.0 Mar 7, 2019
   - 💡 New http error handler
   - 💄 Decompose tool from each other, now tool only depend on Server context
