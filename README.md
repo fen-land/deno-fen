@@ -1,4 +1,5 @@
 # Fen (a simple web framework for deno)
+[![Build Status](https://travis-ci.org/fen-land/deno-fen.svg?branch=master)](https://travis-ci.org/fen-land/deno-fen)
 
 > It's still on development. Using deno v0.3.2.
 > Welcome to join us or give your advice
@@ -286,11 +287,12 @@ and here is some of the option you can fit in
 
 ## Update Log
 
-- v0.7.0 Mar 11, 2019
+- v0.7.1 Mar 11, 2019
   - 💡 New path structure for import
   - 💄 Now all process and tool pass data through context.data
   - 🎉 Using deno v0.3.2 now
   - 🎉 Add a bunch of test now
+  - ⚠️ don't using v0.7.0, there some issue with this version
 - v0.6.0 Mar 7, 2019
   - 💡 New http error handler
   - 💄 Decompose tool from each other, now tool only depend on Server context
