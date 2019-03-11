@@ -74,8 +74,9 @@ export function bodyDecoder(body: Uint8Array, header: Headers) {
       return decoder.decode(body);
     }
 
-    return body;
   }
+
+  return body;
 }
 
 /**
@@ -91,7 +92,7 @@ export function errorBodyGen(status: number, info: string) {
         <title>Fen - ${status}</title>
     </head>
     <body>
-        <h1>Error ${status} !</h1>
+        <h1>Error: ${status}!</h1>
         <p>${info}</p>
     </body>
 </html>

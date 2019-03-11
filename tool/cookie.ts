@@ -28,8 +28,7 @@ export function cookieReader(cookie: string) {
  * @return {string}
  */
 export function cookie2String(cookie: Map<string, string>) {
-  let result = "";
-  cookie.forEach((v, k) => (result += v ? `${k}=${v}; ` : `${k}; `));
-  result.trim().slice(0, -1);
-  return result;
+  let result = [];
+  cookie.forEach((v, k) => (result.push(`${k}=${v}`)));
+  return result.join('; ');
 }

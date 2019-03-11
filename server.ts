@@ -33,12 +33,12 @@ export interface IRespondConfig {
 export interface IContext {
   url: string;
   method: string;
-  proto: ServerRequest.proto;
+  proto: ServerRequest['proto'];
   headers: Headers;
-  conn: ServerRequest.conn;
-  reader: ServerRequest.reader;
-  writer: ServerRequest.writer;
-  request: ServerRequest.request;
+  conn: ServerRequest['conn'];
+  reader: ServerRequest['r'];
+  writer: ServerRequest['w'];
+  request: ServerRequest;
   path: string;
   params: Map<string, string>;
   data: Map<string, any>;
@@ -120,6 +120,7 @@ export class Server {
   ip = "0.0.0.0";
   _server;
   logger = new Logger();
+  __test_run__ = false;
 
   private _processes = [];
 

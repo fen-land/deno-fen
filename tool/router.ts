@@ -9,7 +9,7 @@
  * @param target
  * @param template
  */
-function extractParams(target: string, template: string) {
+export function extractParams(target: string, template: string) {
   let t1 = target.split("/"),
     t2 = template.split("/");
   const result = {};
