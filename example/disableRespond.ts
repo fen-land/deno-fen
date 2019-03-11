@@ -1,4 +1,4 @@
-import { Server } from "../src/server.ts";
+import { Server } from "../server.ts";
 
 const s = new Server();
 // when you decide to respond by your own, pls try disableRespond in config

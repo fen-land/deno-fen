@@ -1,6 +1,13 @@
 /**
+ * tool/cookie.ts
+ * Cookie 2 Map 2 Cookie happens here
+ * @author DominicMing
+ */
+
+/**
  * Turn cookie in to string string map
- * @param cookie
+ * @param cookie {string}
+ * @return {Map<string, string>}
  */
 export function cookieReader(cookie: string) {
   const result = new Map<string, string>();
@@ -17,7 +24,8 @@ export function cookieReader(cookie: string) {
 
 /**
  * Turn string map back into cookie
- * @param cookie
+ * @param cookie {Map<string, string>}
+ * @return {string}
  */
 export function cookie2String(cookie: Map<string, string>) {
   let result = "";

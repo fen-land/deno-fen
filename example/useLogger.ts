@@ -1,5 +1,5 @@
-import { Server } from "../src/server.ts";
-import Session from "../src/process/session.ts";
+import { Server } from "../server.ts";
+import Session from "../process/session.ts";
 
 const session = new Session();
 

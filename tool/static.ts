@@ -1,3 +1,14 @@
+/**
+ * tool/static.ts
+ * Static controller for static
+ * @author DominicMing
+ */
+
+const { cwd, stat, readFile } = Deno;
+
+/**
+ * extension name 2 mime type
+ */
 const ext2mime = {
   ".aac": "audio/aac",
   ".abw": "application/x-abiword",
@@ -73,8 +84,6 @@ const ext2mime = {
   ".7z": "application/x-7z-compressed"
 };
 
-const { cwd, stat, readFile } = Deno;
-
 const defaultOpts = {
   root: "",
   maxAge: 0,
@@ -84,6 +93,11 @@ const defaultOpts = {
   pathRender: str => str
 };
 
+/**
+ * Generate a process function that can be fit into process
+ * @deprecated
+ * @param option
+ */
 export function staticProcess(option = {}) {
   const opt = { ...defaultOpts, ...option };
 
@@ -103,7 +117,7 @@ export function staticProcess(option = {}) {
 
     if (method !== "GET" && method !== "HEAD") {
       logger.error("[STATIC] method not allowed", context.method);
-      context.throw(405, 'Method Not Allowed');
+      context.throw(405, "Method Not Allowed");
     }
 
     try {
@@ -136,7 +150,7 @@ export function staticProcess(option = {}) {
           config.mimeType = ext2mime[ext];
         }
       } else {
-        context.throw(404, 'Not Found Route');
+        context.throw(404, "Not Found Route");
       }
 
       if (maxAge || immutable) {
@@ -154,11 +168,121 @@ export function staticProcess(option = {}) {
       }
     } catch (e) {
       logger.error("[STATIC] static file error", e);
-      context.throw(404, 'Not Found File');
+      context.throw(404, "Not Found File");
     }
 
     if (!file) {
-      context.throw(404, 'Not Found File');
+      context.throw(404, "Not Found File");
+    }
+
+    logger.trace(
+      "[STATIC]",
+      context.path,
+      context.method,
+      context.status,
+      filePath
+    );
+  };
+}
+
+/**
+ * Static process class
+ */
+export class Static {
+  root: string;
+  maxAge: number;
+  allowHidden: boolean;
+  index: string;
+  immutable: boolean;
+  pathRender: (string) => string;
+
+  constructor(opt = defaultOpts) {
+    let { root, maxAge, allowHidden, index, pathRender, immutable } = opt;
+
+    this.root = root;
+    this.maxAge = maxAge;
+    this.allowHidden = allowHidden;
+    this.index = index;
+    this.pathRender = pathRender;
+    this.immutable = immutable;
+  }
+
+  /**
+   * static process fit into server
+   * @param context
+   */
+  controller = async context => {
+    const { config, logger, method } = context;
+    const { root, allowHidden, maxAge, index, immutable, pathRender } = this;
+    const path = pathRender(context.path);
+    let filePath = (root || cwd()) + path;
+    let file;
+
+    config.mimeType = "";
+    config.charset = "";
+
+    if (!filePath.startsWith("/")) {
+      filePath = cwd() + filePath;
+    }
+
+    if (method !== "GET" && method !== "HEAD") {
+      logger.error("[STATIC] method not allowed", context.method);
+      context.throw(405, "Method Not Allowed");
+    }
+
+    try {
+      file = await stat(filePath);
+
+      if (file.isDirectory()) {
+        if (!filePath.endsWith("/")) {
+          filePath += "/";
+        }
+
+        file = await stat(filePath + index);
+      }
+
+      const ext = "." + filePath.split(".").pop();
+
+      if (
+        !allowHidden &&
+        filePath
+          .split("/")
+          .pop()
+          .startsWith(".")
+      ) {
+        context.throw(403, "Forbidden File");
+      }
+
+      if (file) {
+        context.body = await readFile(filePath);
+
+        if (ext2mime[ext]) {
+          config.mimeType = ext2mime[ext];
+        }
+      } else {
+        context.throw(404, "Not Found Route");
+      }
+
+      if (maxAge || immutable) {
+        const cc = [];
+
+        if (maxAge) {
+          cc.push("max-age=" + maxAge / 1000);
+        }
+
+        if (immutable) {
+          cc.push("immutable");
+        }
+
+        context.headers.append("cache-control", cc.join(","));
+      }
+    } catch (e) {
+      logger.error("[STATIC] static file error", e);
+      context.throw(404, "Not Found File");
+    }
+
+    if (!file) {
+      context.throw(404, "Not Found File");
     }
 
     logger.trace(

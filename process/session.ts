@@ -1,5 +1,14 @@
+/**
+ * process/session.ts
+ * Session process for fen
+ * @author DominicMing
+ */
+
 import { cookieReader, cookie2String } from "../tool/cookie.ts";
 
+/**
+ * session config
+ */
 interface ISessionConfig {
   name?: string;
   maxAge?: number;
@@ -8,15 +17,21 @@ interface ISessionConfig {
   secure: boolean;
 }
 
+/**
+ * get random id
+ * @return string
+ */
 function getRandomId() {
   return Math.random()
     .toString(16)
     .slice(-7);
 }
 
-export default class Session {
+/**
+ * Session class
+ */
+export class Session {
   pool = new Map<string, Map<string, any>>();
-  timePool = new Map<string, Date>();
   config: ISessionConfig = {
     name: "fen-session",
     maxAge: 86400000,
@@ -75,7 +90,7 @@ export default class Session {
     }
 
     if (pool) {
-      context.session = pool;
+      context.data.set("session", pool);
     }
 
     return context;

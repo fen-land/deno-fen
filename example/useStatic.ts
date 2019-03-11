@@ -1,5 +1,5 @@
-import { Server } from "../src/server.ts";
-import { staticProcess } from "../src/tool/static.ts";
+import { Server } from "../server.ts";
+import { staticProcess } from "../tool/static.ts";
 
 const s = new Server();
 

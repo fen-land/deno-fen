@@ -1,5 +1,5 @@
-import { Server } from "../src/server.ts";
-import Session from "../src/process/session.ts";
+import { Server } from "../server.ts";
+import { Session } from "../process/session.ts";
 
 const session = new Session();
 
@@ -10,7 +10,7 @@ s.addProcess(session.process);
 s.port = 1882;
 
 s.setController(async ctx => {
-  const { session } = ctx;
+  const session = ctx.data.get("session");
   let c = session.get("c") || 1;
 
   if (ctx.path === "/") {

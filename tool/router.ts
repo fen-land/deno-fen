@@ -1,3 +1,14 @@
+/**
+ * tool/router.ts
+ * An flex router for fen
+ * @author DominicMing
+ */
+
+/**
+ * extract params from route with number
+ * @param target
+ * @param template
+ */
 function extractParams(target: string, template: string) {
   let t1 = target.split("/"),
     t2 = template.split("/");
@@ -12,12 +23,18 @@ function extractParams(target: string, template: string) {
   return result;
 }
 
+/**
+ * Route type used in use method
+ */
 interface IRoute {
   [path: string]: {
     [method: string]: (context) => void;
   };
 }
 
+/**
+ * router himself
+ */
 export class Router {
   constructor(name = "") {
     this.name = name;
@@ -27,7 +44,7 @@ export class Router {
 
   name = "";
 
-  appendRoute(method, route, controller) {
+  appendRoute(method: string, route: string, controller: (context) => void) {
     let pool = this.pool;
     let _route = route.startsWith("/") ? route : "/" + route;
     let routeArr = _route.split("/");
@@ -56,7 +73,7 @@ export class Router {
     });
   }
 
-  private getRoute(path, method) {
+  private getRoute(path: string, method: string) {
     let pool = this.pool;
     let pathArr = path.split("/");
 
@@ -79,22 +96,22 @@ export class Router {
     return null;
   }
 
-  controller = async ctx => {
-    let r = this.getRoute(ctx.path, ctx.method);
+  controller = async context => {
+    let r = this.getRoute(context.path, context.method);
 
     if (r) {
       const { route, controller, name } = r;
-      const params = extractParams(ctx.path, route);
+      const params = extractParams(context.path, route);
 
-      ctx.router = {
+      context.data.set("router", {
         route,
         params,
         name
-      };
+      });
 
-      await controller(ctx);
+      await controller(context);
     } else {
-      ctx.throw(404, 'Not Found Route');
+      context.throw(404, "Not Found Route");
     }
   };
 

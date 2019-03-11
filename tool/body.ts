@@ -1,5 +1,17 @@
+/**
+ * tool/body.ts
+ * Body evolved tool are save here
+ * @author DominicMing
+ */
+
+// this is a global encoder, using by all
 const encoder = new TextEncoder();
 
+/**
+ * encode body if body type supported
+ * @param body
+ * @return Uint8Array
+ */
 export function bodyEncoder(body) {
   let result = encoder.encode("");
 
@@ -20,6 +32,12 @@ export function bodyEncoder(body) {
   return result;
 }
 
+/**
+ * decode body if the content-type supported
+ * @param body {Uint8Array}
+ * @param header {Headers}
+ * @return {string|Uint8Array|Object}
+ */
 export function bodyDecoder(body: Uint8Array, header: Headers) {
   if (header.has("content-type")) {
     let ct = header.get("content-type");
@@ -60,9 +78,15 @@ export function bodyDecoder(body: Uint8Array, header: Headers) {
   }
 }
 
-export function errorBodyGen(status, info) {
+/**
+ * generate error body
+ * @param status {number}
+ * @param info {string}
+ * @return string
+ */
+export function errorBodyGen(status: number, info: string) {
   return `
-<html>
+<html lang="en">
     <head>
         <title>Fen - ${status}</title>
     </head>
