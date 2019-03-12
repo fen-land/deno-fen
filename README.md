@@ -27,9 +27,9 @@ First you should install [deno](https://deno.land):
 curl -fsSL https://deno.land/x/install/install.sh | sh
 ```
 
-Keep In Mind Now That You Are Using Github Url 2 Import Our Script!
+Although we add it to https://deno.land/x/fen, but it doesn't seem to work.
 
-We'll provide a better way to using our script after the work is done.
+We will try to figure it out later
 
 Test if it's work:
 
@@ -46,7 +46,7 @@ s.start();
 Add your own controller
 
 ```typescript
-import { Server } from "https://github.com/fen-land/deno-fen/raw/master/server.ts";
+import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.1/server.ts";
 
 const s = new Server();
 
@@ -111,8 +111,8 @@ process is a series of process between controller, you can develop your own proc
 It's a simple session for Fen, using session(a map) to store data.
 
 ```typescript
-import { Server } from "https://github.com/fen-land/deno-fen/raw/master/server.ts";
-import { Session } from "https://github.com/fen-land/deno-fen/raw/master/process/session.ts";
+import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.1/server.ts";
+import { Session } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.1/process/session.ts";
 
 const session = new Session();
 
@@ -155,8 +155,8 @@ router tool.
 This example shows many way to use router
 
 ```typescript
-import { Server } from "../server.ts";
-import { Router } from "../tool/router.ts";
+import { Server } from "https://github.com/fen-land/deno-fen/raw/master//server.ts";
+import { Router } from "https://github.com/fen-land/deno-fen/raw/master//tool/router.ts";
 
 const s = new Server();
 
@@ -265,8 +265,8 @@ We provide a tool for static file,
 it will generate a controller for server(or router).
 
 ```typescript
-import { Server } from "../server.ts";
-import { staticProcess } from "../tool/static.ts";
+import { Server } from "https://github.com/fen-land/deno-fen/raw/master//server.ts";
+import { staticProcess } from "https://github.com/fen-land/deno-fen/raw/master//tool/static.ts";
 
 const s = new Server();
 
