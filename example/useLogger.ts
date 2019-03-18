@@ -1,5 +1,5 @@
 import { Server } from "../server.ts";
-import Session from "../process/session.ts";
+import { Session } from "../process/session.ts";
 
 const session = new Session();
 
@@ -13,7 +13,8 @@ s.port = 1882;
 s.logger.changeLevel("ALL");
 
 s.setController(async ctx => {
-  const { session, logger } = ctx;
+  const { data, logger } = ctx;
+  const session = data.get('session');
   let c = session.get("c") || 1;
 
   if (ctx.path === "/") {

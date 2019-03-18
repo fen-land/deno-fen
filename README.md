@@ -7,6 +7,9 @@
 >
 > Welcome to join us or give your advice
 
+Using deno 0.3.2 for v0.7.1
+Using deno 0.3.3 for v0.7.2
+
 ![Logo](./logo.png)
 
 - [How 2 use](#how-2-use)
@@ -46,7 +49,7 @@ s.start();
 Add your own controller
 
 ```typescript
-import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.1/server.ts";
+import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.2/server.ts";
 
 const s = new Server();
 
@@ -63,8 +66,7 @@ s.start();
 Then roll with the deno!
 
 ```bash
-deno ${yours}.ts
-⚠️  Deno requests network access to "listen". Grant? [yN] y
+deno ${yours}.ts -A
 ```
 
 ## About Context
@@ -111,8 +113,8 @@ process is a series of process between controller, you can develop your own proc
 It's a simple session for Fen, using session(a map) to store data.
 
 ```typescript
-import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.1/server.ts";
-import { Session } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.1/process/session.ts";
+import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.2/server.ts";
+import { Session } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.2/process/session.ts";
 
 const session = new Session();
 
@@ -292,6 +294,8 @@ and here is some of the option you can fit in
 
 ## Update Log
 
+- v0.7.2 Mar 18, 2019
+  - 💡 Update to support deno 0.3.3 std 0.3.2
 - v0.7.1 Mar 11, 2019
   - 💡 New path structure for import
   - 💄 Now all process and tool pass data through context.data

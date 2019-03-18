@@ -1,7 +1,7 @@
 import {
   serve,
   ServerRequest
-} from "https://deno.land/x/std@v0.3.1/http/server.ts";
+} from "https://deno.land/x/std@v0.3.2/http/server.ts";
 import { bodyEncoder, bodyDecoder, errorBodyGen } from "./tool/body.ts";
 import { Logger } from "./tool/logger.ts";
 
