@@ -30,14 +30,12 @@ First you should install [deno](https://deno.land):
 curl -fsSL https://deno.land/x/install/install.sh | sh
 ```
 
-Although we add it to https://deno.land/x/fen, but it doesn't seem to work.
-
-We will try to figure it out later
+Try it with https://deno.land/x/fen/ to import!
 
 Test if it's work:
 
 ```typescript
-import { Server } from "https://github.com/fen-land/deno-fen/raw/master/server.ts";
+import { Server } from "https://deno.land/x/fen@v0.7.2/server.ts";
 
 const s = new Server();
 
@@ -49,7 +47,7 @@ s.start();
 Add your own controller
 
 ```typescript
-import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.2/server.ts";
+import { Server } from "https://deno.land/x/fen@v0.7.2/server.ts";
 
 const s = new Server();
 
@@ -113,8 +111,8 @@ process is a series of process between controller, you can develop your own proc
 It's a simple session for Fen, using session(a map) to store data.
 
 ```typescript
-import { Server } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.2/server.ts";
-import { Session } from "https://raw.githubusercontent.com/fen-land/deno-fen/v0.7.2/process/session.ts";
+import { Server } from "https://deno.land/x/fen@v0.7.2/server.ts";
+import { Session } from "https://deno.land/x/fen@v0.7.2/process/session.ts";
 
 const session = new Session();
 
