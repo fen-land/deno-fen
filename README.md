@@ -7,8 +7,8 @@
 >
 > Welcome to join us or give your advice
 
-Using deno 0.3.2 for v0.7.1
-Using deno 0.3.3 for v0.7.2
+- Using deno 0.3.2 for v0.7.1
+- Using deno 0.3.3 - 0.3.5 for v0.7.2
 
 ![Logo](./logo.png)
 
