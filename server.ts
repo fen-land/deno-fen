@@ -1,7 +1,7 @@
 import {
   serve,
   ServerRequest
-} from "https://deno.land/x/std@v0.3.2/http/server.ts";
+} from "https://deno.land/x/std@v0.3.4/http/server.ts";
 import { bodyEncoder, bodyDecoder, errorBodyGen } from "./tool/body.ts";
 import { Logger } from "./tool/logger.ts";
 
@@ -160,21 +160,36 @@ export class Server {
 
     logger.info(`Server now listen on ${this.ip}:${this.port}`);
 
-    for await (const req of this._server) {
-      let context = await req2ctx(req, this);
-      let errorBody = null;
+    try {
+      for await (const req of this._server) {
+        let context = await req2ctx(req, this);
+        let errorBody = null;
 
-      if (this._processes.length) {
-        for (const process of this._processes) {
-          try {
-            let result = await process(context);
-            if (result) {
-              context = result;
-            } else {
-              logger.error("Process didn't return context properly", process);
+        if (this._processes.length) {
+          for (const process of this._processes) {
+            try {
+              let result = await process(context);
+              if (result) {
+                context = result;
+              } else {
+                logger.error("Process didn't return context properly", process);
+              }
+            } catch (err) {
+              logger.error("While process", err);
+              if (err.code) {
+                errorBody = errorBodyGen(err.code, err.message);
+                context.status = err.code;
+                context.body = errorBody;
+              }
             }
+          }
+        }
+
+        if (!errorBody) {
+          try {
+            await this.controller(context);
           } catch (err) {
-            logger.error("While process", err);
+            logger.error("While Controller", err);
             if (err.code) {
               errorBody = errorBodyGen(err.code, err.message);
               context.status = err.code;
@@ -182,54 +197,43 @@ export class Server {
             }
           }
         }
-      }
 
-      if (!errorBody) {
-        try {
-          await this.controller(context);
-        } catch (err) {
-          logger.error("While Controller", err);
-          if (err.code) {
-            errorBody = errorBodyGen(err.code, err.message);
-            context.status = err.code;
-            context.body = errorBody;
-          }
-        }
-      }
+        const {body, headers, status, config} = context;
+        const respondOption = {};
 
-      const { body, headers, status, config } = context;
-      const respondOption = {};
-
-      if (!config.disableRespond) {
-        if (!config.disableBodyEncode) {
-          respondOption["body"] = bodyEncoder(body);
-        }
-
-        if (headers) {
-          respondOption["headers"] = headers;
-        }
-
-        if (!config.disableContentType) {
-          if (errorBody) {
-            config.mimeType = "text/html";
+        if (!config.disableRespond) {
+          if (!config.disableBodyEncode) {
+            respondOption["body"] = bodyEncoder(body);
           }
 
-          if (config.charset) {
-            headers.set(
-              "content-type",
-              `${config.mimeType}; charset="${config.charset}"`
-            );
-          } else {
-            headers.set("content-type", `${config.mimeType}`);
+          if (headers) {
+            respondOption["headers"] = headers;
           }
-        }
 
-        if (status) {
-          respondOption["status"] = status;
-        }
+          if (!config.disableContentType) {
+            if (errorBody) {
+              config.mimeType = "text/html";
+            }
 
-        await req.respond(respondOption);
+            if (config.charset) {
+              headers.set(
+                "content-type",
+                `${config.mimeType}; charset="${config.charset}"`
+              );
+            } else {
+              headers.set("content-type", `${config.mimeType}`);
+            }
+          }
+
+          if (status) {
+            respondOption["status"] = status;
+          }
+          await req.respond(respondOption);
+        }
       }
+    } catch (e) {
+      logger.error(e);
+      return -1;
     }
   }
 }

@@ -6,9 +6,12 @@
 > A simple web framework for deno.
 >
 > Welcome to join us or give your advice
+>
+> Now I'm working on [sqlflow](https://github.com/sql-machine-learning/sqlflow) (use sql to train ai) so this project will get less maintain.
 
 - Using deno 0.3.2 for v0.7.1
 - Using deno 0.3.3 - 0.3.5 for v0.7.2
+- Using deno 0.3.4+ for v0.7.3
 
 ![Logo](./logo.png)
 
@@ -291,7 +294,8 @@ and here is some of the option you can fit in
 ```
 
 ## Update Log
-
+- v0.7.3 April 15, 2019
+  - 💡 Update to support deno 0.3.7 std 0.3.4
 - v0.7.2 Mar 18, 2019
   - 💡 Update to support deno 0.3.3 std 0.3.2
 - v0.7.1 Mar 11, 2019
