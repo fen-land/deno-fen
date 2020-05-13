@@ -4,6 +4,8 @@
  * @author DominicMing
  */
 
+import { IContext } from "../server.ts";
+
 const { cwd, stat, readFile } = Deno;
 
 /**
@@ -81,7 +83,9 @@ const ext2mime = {
   ".zip": "application/zip",
   ".3gp": "video/3gpp",
   ".3g2": "video/3gpp2",
-  ".7z": "application/x-7z-compressed"
+  ".7z": "application/x-7z-compressed",
+} as {
+  [type: string]: string;
 };
 
 const defaultOpts = {
@@ -90,7 +94,7 @@ const defaultOpts = {
   allowHidden: false,
   index: "index.html",
   immutable: false,
-  pathRender: str => str
+  pathRender: (str: string) => str,
 };
 
 /**
@@ -101,7 +105,7 @@ const defaultOpts = {
 export function staticProcess(option = {}) {
   const opt = { ...defaultOpts, ...option };
 
-  return async function(context) {
+  return async function (context: IContext) {
     const { config, logger, method } = context;
     const { root, allowHidden, maxAge, index, immutable, pathRender } = opt;
     const path = pathRender(context.path);
@@ -123,7 +127,7 @@ export function staticProcess(option = {}) {
     try {
       file = await stat(filePath);
 
-      if (file.isDirectory()) {
+      if (file.isDirectory) {
         if (!filePath.endsWith("/")) {
           filePath += "/";
         }
@@ -134,13 +138,14 @@ export function staticProcess(option = {}) {
       const ext = "." + filePath.split(".").pop();
 
       if (
-        !allowHidden &&
-        filePath
-          .split("/")
-          .pop()
-          .startsWith(".")
+        !allowHidden
       ) {
-        context.throw(403, "Forbidden File");
+        const filename = filePath
+          .split("/")
+          .pop();
+        if (filename && filename.startsWith(".")) {
+          context.throw(403, "Forbidden File");
+        }
       }
 
       if (file) {
@@ -180,7 +185,7 @@ export function staticProcess(option = {}) {
       context.path,
       context.method,
       context.status,
-      filePath
+      filePath,
     );
   };
 }
@@ -194,7 +199,7 @@ export class Static {
   allowHidden: boolean;
   index: string;
   immutable: boolean;
-  pathRender: (string) => string;
+  pathRender: (path: string) => string;
 
   constructor(opt = defaultOpts) {
     let { root, maxAge, allowHidden, index, pathRender, immutable } = opt;
@@ -211,7 +216,7 @@ export class Static {
    * static process fit into server
    * @param context
    */
-  controller = async context => {
+  controller = async (context: IContext) => {
     const { config, logger, method } = context;
     const { root, allowHidden, maxAge, index, immutable, pathRender } = this;
     const path = pathRender(context.path);
@@ -233,7 +238,7 @@ export class Static {
     try {
       file = await stat(filePath);
 
-      if (file.isDirectory()) {
+      if (file.isDirectory) {
         if (!filePath.endsWith("/")) {
           filePath += "/";
         }
@@ -244,13 +249,14 @@ export class Static {
       const ext = "." + filePath.split(".").pop();
 
       if (
-        !allowHidden &&
-        filePath
-          .split("/")
-          .pop()
-          .startsWith(".")
+        !allowHidden
       ) {
-        context.throw(403, "Forbidden File");
+        const filename = filePath
+          .split("/")
+          .pop();
+        if (filename && filename.startsWith(".")) {
+          context.throw(403, "Forbidden File");
+        }
       }
 
       if (file) {
@@ -290,7 +296,7 @@ export class Static {
       context.path,
       context.method,
       context.status,
-      filePath
+      filePath,
     );
   };
 }

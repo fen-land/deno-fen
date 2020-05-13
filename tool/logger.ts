@@ -6,15 +6,15 @@
 
 // map for level to number
 const levelMap = {
-  ALL: 0,
-  TRACE: 1,
-  DEBUG: 2,
-  INFO: 3,
-  WARN: 4,
-  ERROR: 5,
-  FATAL: 6,
-  OFF: 7
-};
+  "ALL": 0,
+  "TRACE": 1,
+  "DEBUG": 2,
+  "INFO": 3,
+  "WARN": 4,
+  "ERROR": 5,
+  "FATAL": 6,
+  "OFF": 7,
+} as { [key: string]: number };
 
 // default level are given here
 const DEFAULT_LEVEL = "INFO";
@@ -60,30 +60,30 @@ export class Logger {
    * @param level {string}
    */
   changeLevel(level: string = DEFAULT_LEVEL) {
-    this.level = levelMap[level.toUpperCase()];
+    this.level = levelMap[level] || 0;
   }
 
-  trace(...info) {
+  trace(...info: any[]) {
     this.print("TRACE", info);
   }
 
-  debug(...info) {
+  debug(...info: any[]) {
     this.print("DEBUG", info);
   }
 
-  info(...info) {
+  info(...info: any[]) {
     this.print("INFO", info);
   }
 
-  warn(...info) {
+  warn(...info: any[]) {
     this.print("WARN", info);
   }
 
-  error(...info) {
+  error(...info: any[]) {
     this.print("ERROR", info);
   }
 
-  fatal(...info) {
+  fatal(...info: any[]) {
     this.print("FATAL", info);
   }
 }

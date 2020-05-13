@@ -12,9 +12,9 @@ s.port = 1882;
 // You can change logger level for more info
 s.logger.changeLevel("ALL");
 
-s.setController(async ctx => {
+s.setController(async (ctx) => {
   const { data, logger } = ctx;
-  const session = data.get('session');
+  const session = data.get("session");
   let c = session.get("c") || 1;
 
   if (ctx.path === "/") {

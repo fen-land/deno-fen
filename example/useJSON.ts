@@ -2,12 +2,12 @@ import { Server } from "../server.ts";
 
 const s = new Server();
 
-s.setController(async ctx => {
+s.setController(async (ctx) => {
   ctx.config.mimeType = "application/json";
   ctx.body = {
     now: "you",
     can: ["see"],
-    me: 2
+    me: 2,
   };
 });
 

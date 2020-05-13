@@ -1,7 +1,8 @@
 import {
   serve,
-  ServerRequest
-} from "https://deno.land/x/std@v0.3.4/http/server.ts";
+  ServerRequest,
+  Server as DenoServer,
+} from "https://deno.land/std/http/server.ts";
 import { bodyEncoder, bodyDecoder, errorBodyGen } from "./tool/body.ts";
 import { Logger } from "./tool/logger.ts";
 
@@ -33,11 +34,11 @@ export interface IRespondConfig {
 export interface IContext {
   url: string;
   method: string;
-  proto: ServerRequest['proto'];
+  proto: ServerRequest["proto"];
   headers: Headers;
-  conn: ServerRequest['conn'];
-  reader: ServerRequest['r'];
-  writer: ServerRequest['w'];
+  conn: ServerRequest["conn"];
+  reader: ServerRequest["r"];
+  writer: ServerRequest["w"];
   request: ServerRequest;
   path: string;
   params: Map<string, string>;
@@ -51,6 +52,10 @@ export interface IContext {
   throw: (code: number, msg: string) => void;
 }
 
+export type Controller = (ctx: IContext) => Promise<void>;
+
+export type Process = (ctx: IContext) => Promise<IContext>;
+
 /**
  * create context from request
  * @param request
@@ -59,12 +64,12 @@ export interface IContext {
  */
 async function req2ctx(
   request: ServerRequest,
-  server: Server
+  server: Server,
 ): Promise<IContext> {
   // match params in url
   const paramsRegx: RegExp = /\?[^]*/;
   const { url, method, proto, conn, r: reader, w: writer } = request;
-  const originBody = await request.body();
+  const originBody = await Deno.readAll(request.body);
   const reqBody = bodyDecoder(originBody, request.headers);
   let path = url,
     params = new Map<string, string>();
@@ -74,20 +79,23 @@ async function req2ctx(
     disableBodyEncode: false,
     disableContentType: false,
     mimeType: "text/plain",
-    charset: "utf-8"
+    charset: "utf-8",
   };
 
   // read two part in url (path, param)
   if (paramsRegx.test(url)) {
-    let { index } = url.match(paramsRegx);
-    let p = url.substring(index + 1).split("&");
+    let index = url.match(paramsRegx)?.index;
 
-    path = url.substring(0, index);
+    if (index !== undefined) {
+      let p = url.substring(index + 1).split("&");
 
-    for (const param of p) {
-      let [key, val] = param.split("=");
+      path = url.substring(0, index);
 
-      params.set(key, val);
+      for (const param of p) {
+        let [key, val] = param.split("=");
+
+        params.set(key, val);
+      }
     }
   }
 
@@ -111,35 +119,34 @@ async function req2ctx(
     logger: server.logger,
     throw: (code, msg) => {
       throw new HttpError(code, msg);
-    }
+    },
   };
 }
 
 export class Server {
   port = 8088;
   ip = "0.0.0.0";
-  _server;
+  _server: DenoServer | null = null;
   logger = new Logger();
   __test_run__ = false;
 
-  private _processes = [];
+  private _processes: Process[] = [];
 
-  private async _defaultController(ctx) {
-    ctx.body = `You have success build a server with fen on  ${this.ip}:${
-      this.port
-    }\n
+  private async _defaultController(ctx: IContext) {
+    ctx.body =
+      `You have success build a server with fen on  ${this.ip}:${this.port}\n
             Try set controller using setController method,
             Or try our route tool :)
         `;
   }
 
-  addProcess(process) {
-    if (this._processes.filter(e => e === process).length === 0) {
+  addProcess(process: Process) {
+    if (this._processes.filter((e) => e === process).length === 0) {
       this._processes.push(process);
     }
   }
 
-  private _controller;
+  private _controller: (Controller | null) = null;
 
   get controller() {
     if (this._controller) {
@@ -149,7 +156,7 @@ export class Server {
     return this._defaultController;
   }
 
-  setController(controller: (context) => void) {
+  setController(controller: Controller) {
     this._controller = controller;
   }
 
@@ -198,8 +205,10 @@ export class Server {
           }
         }
 
-        const {body, headers, status, config} = context;
-        const respondOption = {};
+        const { body, headers, status, config } = context;
+        const respondOption = {} as {
+          [key: string]: any;
+        };
 
         if (!config.disableRespond) {
           if (!config.disableBodyEncode) {
@@ -218,7 +227,7 @@ export class Server {
             if (config.charset) {
               headers.set(
                 "content-type",
-                `${config.mimeType}; charset="${config.charset}"`
+                `${config.mimeType}; charset="${config.charset}"`,
               );
             } else {
               headers.set("content-type", `${config.mimeType}`);

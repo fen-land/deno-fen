@@ -4,6 +4,8 @@
  * @author DominicMing
  */
 
+import { Controller, IContext } from "../server.ts";
+
 /**
  * extract params from route with number
  * @param target
@@ -12,7 +14,9 @@
 export function extractParams(target: string, template: string) {
   let t1 = target.split("/"),
     t2 = template.split("/");
-  const result = {};
+  const result = {} as {
+    [key: string]: string;
+  };
 
   t2.map((el, i) => {
     if (el.startsWith(":")) {
@@ -28,7 +32,7 @@ export function extractParams(target: string, template: string) {
  */
 interface IRoute {
   [path: string]: {
-    [method: string]: (context) => void;
+    [method: string]: (context: IContext) => Promise<void>;
   };
 }
 
@@ -44,7 +48,7 @@ export class Router {
 
   name = "";
 
-  appendRoute(method: string, route: string, controller: (context) => void) {
+  appendRoute(method: string, route: string, controller: Controller) {
     let pool = this.pool;
     let _route = route.startsWith("/") ? route : "/" + route;
     let routeArr = _route.split("/");
@@ -69,7 +73,7 @@ export class Router {
       originalRoute: _route,
       method,
       controller,
-      name: routerName
+      name: routerName,
     });
   }
 
@@ -96,7 +100,7 @@ export class Router {
     return null;
   }
 
-  controller = async context => {
+  controller = async (context: IContext) => {
     let r = this.getRoute(context.path, context.method);
 
     if (r) {
@@ -106,7 +110,7 @@ export class Router {
       context.data.set("router", {
         route,
         params,
-        name
+        name,
       });
 
       await controller(context);
@@ -160,6 +164,10 @@ export class Router {
     while (changeQ.length > 0) {
       let change = changeQ.pop();
 
+      if (!change) {
+        continue;
+      }
+
       for (const [key, val] of change.entries()) {
         if (val instanceof Map) {
           changeQ.push(val);
@@ -172,42 +180,42 @@ export class Router {
     return this;
   }
 
-  get(route, controller) {
+  get(route: string, controller: Controller) {
     this.appendRoute("GET", route, controller);
     return this;
   }
 
-  post(route, controller) {
+  post(route: string, controller: Controller) {
     this.appendRoute("POST", route, controller);
     return this;
   }
 
-  head(route, controller) {
+  head(route: string, controller: Controller) {
     this.appendRoute("HEAD", route, controller);
     return this;
   }
 
-  put(route, controller) {
+  put(route: string, controller: Controller) {
     this.appendRoute("PUT", route, controller);
     return this;
   }
 
-  delete(route, controller) {
+  delete(route: string, controller: Controller) {
     this.appendRoute("DELETE", route, controller);
     return this;
   }
 
-  connect(route, controller) {
+  connect(route: string, controller: Controller) {
     this.appendRoute("CONNECT", route, controller);
     return this;
   }
 
-  options(route, controller) {
+  options(route: string, controller: Controller) {
     this.appendRoute("OPTION", route, controller);
     return this;
   }
 
-  trace(route, controller) {
+  trace(route: string, controller: Controller) {
     this.appendRoute("TRACE", route, controller);
     return this;
   }

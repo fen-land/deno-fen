@@ -12,7 +12,7 @@ const encoder = new TextEncoder();
  * @param body
  * @return Uint8Array
  */
-export function bodyEncoder(body) {
+export function bodyEncoder(body: any) {
   let result = encoder.encode("");
 
   if (body instanceof Uint8Array) {
@@ -41,14 +41,19 @@ export function bodyEncoder(body) {
 export function bodyDecoder(body: Uint8Array, header: Headers) {
   if (header.has("content-type")) {
     let ct = header.get("content-type");
+
+    if (!ct) {
+      return body;
+    }
+
     let charset = ct.match(/charset="([^]*)"/i);
     let decoder = new TextDecoder(charset ? charset[1] : "utf-8");
 
     if (/application\/x-www-form-urlencoded/i.test(ct)) {
       let ctt = decoder.decode(body);
-      let obj = {};
+      let obj = {} as { [key: string]: string };
 
-      ctt.split("&").map(e => {
+      ctt.split("&").map((e) => {
         let [k, v] = e.trim().split("=");
         let key = decodeURIComponent(k);
         obj[key] = decodeURIComponent(v || "");
@@ -57,7 +62,7 @@ export function bodyDecoder(body: Uint8Array, header: Headers) {
       return obj;
     }
 
-    if (/application\/json/i.test(ct)) {
+    if (ct && /application\/json/i.test(ct)) {
       let obj = {};
       let ctt = decoder.decode(body);
 
@@ -70,10 +75,9 @@ export function bodyDecoder(body: Uint8Array, header: Headers) {
       return obj;
     }
 
-    if (ct.includes("text")) {
+    if (ct && ct.includes("text")) {
       return decoder.decode(body);
     }
-
   }
 
   return body;

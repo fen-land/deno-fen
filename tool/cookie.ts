@@ -28,7 +28,7 @@ export function cookieReader(cookie: string) {
  * @return {string}
  */
 export function cookie2String(cookie: Map<string, string>) {
-  let result = [];
+  let result = [] as string[];
   cookie.forEach((v, k) => (result.push(`${k}=${v}`)));
-  return result.join('; ');
+  return result.join("; ");
 }

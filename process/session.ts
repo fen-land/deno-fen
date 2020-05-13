@@ -5,6 +5,7 @@
  */
 
 import { cookieReader, cookie2String } from "../tool/cookie.ts";
+import { IContext } from "../server.ts";
 
 /**
  * session config
@@ -37,18 +38,22 @@ export class Session {
     maxAge: 86400000,
     httpOnly: true,
     forceSetHeader: false,
-    secure: false
+    secure: false,
   };
 
-  constructor(config?) {
+  constructor(config: ISessionConfig = { secure: false }) {
     this.config = { ...this.config, ...config };
   }
 
-  process = async context => {
+  process = async (context: IContext) => {
     const { headers } = context.request;
     const { logger } = context;
     const cookieStr = headers.has("cookie") ? headers.get("cookie") : "";
-    let { name, secure, forceSetHeader, httpOnly, maxAge } = this.config;
+    if (typeof cookieStr !== "string") {
+      return context;
+    }
+    let { name = "fen-session", secure, forceSetHeader, httpOnly, maxAge } =
+      this.config;
     const cookie = cookieReader(cookieStr);
     const setCookie = new Map<string, string>();
     const time = +new Date();
@@ -62,6 +67,10 @@ export class Session {
       id = cookie.get(name);
     }
 
+    if (!id) {
+      return context;
+    }
+
     if (!this.pool.has(id)) {
       this.pool.set(id, new Map<string, any>());
       logger.trace("[SESSION] create new session id for this request;");
@@ -70,7 +79,7 @@ export class Session {
 
     const pool = this.pool.get(id);
 
-    if (forceSetHeader) {
+    if (forceSetHeader && name) {
       setCookie.set(name, id);
       if (httpOnly) {
         logger.trace("[SESSION] set httpOnly;");
