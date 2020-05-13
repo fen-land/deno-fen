@@ -2,16 +2,17 @@
 [![Build Status](https://travis-ci.org/fen-land/deno-fen.svg?branch=master)](https://travis-ci.org/fen-land/deno-fen)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/fen-land/deno-fen.svg?color=%2366ccff&label=version)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/denoland/deno_std.svg?label=deno_std)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/denoland/deno.svg?label=deno)
 
 > A simple web framework for deno.
 >
 > Welcome to join us or give your advice
 >
-> Now I'm working on [sqlflow](https://github.com/sql-machine-learning/sqlflow) (use sql to train ai) so this project will get less maintain.
 
 - Using deno 0.3.2 for v0.7.1
 - Using deno 0.3.3 - 0.3.5 for v0.7.2
 - Using deno 0.3.4+ for v0.7.3
+- Using deno 1.0.0 foe v0.8.0
 
 ![Logo](./logo.png)
 
