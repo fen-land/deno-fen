@@ -295,6 +295,8 @@ and here is some of the option you can fit in
 ```
 
 ## Update Log
+- v0.8.0 May 13, 2020
+  - 🎉 Rewrite for deno v1.0.0! Welcome to deno 1.x area
 - v0.7.3 April 15, 2019
   - 💡 Update to support deno 0.3.7 std 0.3.4
 - v0.7.2 Mar 18, 2019
