@@ -6,7 +6,7 @@ install:
 
 script:
   - deno --version
-  - deno test -A --reload --recompile
+  - deno test --allow-all
 
 cache:
   directories:

@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/fen-land/deno-fen.svg?branch=master)](https://travis-ci.org/fen-land/deno-fen)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/fen-land/deno-fen.svg?color=%2366ccff&label=version)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/denoland/deno_std.svg?label=deno_std)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/denoland/deno.svg?label=deno)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/release/denoland/deno.svg?label=deno)
 
 > A simple web framework for deno.
 >
