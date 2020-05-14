@@ -39,7 +39,7 @@ Try it with https://deno.land/x/fen/ to import!
 Test if it's work:
 
 ```typescript
-import { Server } from "https://deno.land/x/fen@v0.7.2/server.ts";
+import { Server } from "https://deno.land/x/fen/server.ts";
 
 const s = new Server();
 
@@ -51,7 +51,7 @@ s.start();
 Add your own controller
 
 ```typescript
-import { Server } from "https://deno.land/x/fen@v0.7.2/server.ts";
+import { Server } from "https://deno.land/x/fen/server.ts";
 
 const s = new Server();
 
@@ -68,7 +68,7 @@ s.start();
 Then roll with the deno!
 
 ```bash
-deno ${yours}.ts -A
+deno run --allow-all ${yours}.ts
 ```
 
 ## About Context
@@ -115,8 +115,8 @@ process is a series of process between controller, you can develop your own proc
 It's a simple session for Fen, using session(a map) to store data.
 
 ```typescript
-import { Server } from "https://deno.land/x/fen@v0.7.2/server.ts";
-import { Session } from "https://deno.land/x/fen@v0.7.2/process/session.ts";
+import { Server } from "https://deno.land/x/fen/server.ts";
+import { Session } from "https://deno.land/x/fen/process/session.ts";
 
 const session = new Session();
 
